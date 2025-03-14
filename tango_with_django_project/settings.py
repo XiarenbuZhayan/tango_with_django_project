@@ -123,3 +123,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# 添加静态文件目录配置
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'app01/static'),
+]
+
+# 静态文件收集目录
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Media文件配置
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
