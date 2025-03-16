@@ -64,18 +64,18 @@
             flex-direction: column;
             justify-content: flex-start;
         }
-        /* 为每个产品卡片设置不同的背景渐变 */
+        /* 为每个产品卡片设置不同的背景渐变变 */
         .product-card-1 .product-content {
             background: linear-gradient(to bottom, rgba(245, 245, 247, 0.9) 0%, rgba(245, 245, 247, 0.7) 20%, rgba(245, 245, 247, 0.4) 40%, rgba(245, 245, 247, 0) 70%);
         }
         .product-card-2 .product-content {
             background: linear-gradient(to bottom, rgba(245, 245, 247, 0.9) 0%, rgba(245, 245, 247, 0.7) 20%, rgba(245, 245, 247, 0.4) 40%, rgba(245, 245, 247, 0) 70%);
         }
-        /* 第三个卡片使用深色背景，解决泛白问题 */
+        /* 第三个卡片使用深色背景，解决泛白问题题 */
         .product-card-3 .product-content {
             background: linear-gradient(to bottom, rgba(29, 29, 31, 0.8) 0%, rgba(29, 29, 31, 0.6) 20%, rgba(29, 29, 31, 0.3) 40%, rgba(29, 29, 31, 0) 70%);
         }
-        /* 第三个卡片的文字颜色改为白色 */
+        /* 第三个卡片的文字颜色改为白色色 */
         .product-card-3 .product-title,
         .product-card-3 .product-price {
             color: #ffffff;
@@ -144,7 +144,7 @@
     </style>
 </head>
 <body>
-    <!-- 导航栏 -->
+    <!-- 导航栏栏栏 -->
     {% include 'navbar.html' %}
 
     <!-- 主标题 -->
@@ -152,31 +152,41 @@
         <h1 class="display-4 mb-5">E-trade,<br>the best platform for buying products you like</h1>
         <p class="lead mb-5">E-trade is the best platform for buying products you like</p>
         
-        <!-- 产品类别 -->
+        <!-- 产品类别别别 -->
         <div class="row justify-content-center">
             <div class="col-md-2 category-item">
-                <img src="{% static 'images/store-card-13-iphone-nav-202502_GEO_GB.png' %}" alt="iPhone" class="img-fluid mb-3" style="border-radius: 10px;">
-                <h6>Phone</h6>
+                <a href="{% url 'phone' %}" class="text-decoration-none">
+                    <img src="{% static 'images/store-card-13-iphone-nav-202502_GEO_GB.png' %}" alt="iPhone" class="img-fluid mb-3" style="border-radius: 10px;">
+                    <h6>Phone</h6>
+                </a>
             </div>
             <div class="col-md-2 category-item">
-                <img src="{% static 'images/store-card-13-ipad-nav-202405.png' %}" alt="Tablet" class="img-fluid mb-3" style="border-radius: 10px;">
-                <h6>Tablet</h6>
+                <a href="{% url 'tablet' %}" class="text-decoration-none">
+                    <img src="{% static 'images/store-card-13-ipad-nav-202405.png' %}" alt="Tablet" class="img-fluid mb-3" style="border-radius: 10px;">
+                    <h6>Tablet</h6>
+                </a>
             </div>
             <div class="col-md-2 category-item">
-                <img src="{% static 'images/store-card-13-mac-nav-202503.png' %}" alt="Laptop" class="img-fluid mb-3" style="border-radius: 10px;">
-                <h6>Laptop</h6>
+                <a href="{% url 'notebook' %}" class="text-decoration-none">
+                    <img src="{% static 'images/store-card-13-mac-nav-202503.png' %}" alt="Laptop" class="img-fluid mb-3" style="border-radius: 10px;">
+                    <h6>Laptop</h6>
+                </a>
             </div>
             <div class="col-md-2 category-item">
-                <img src="{% static 'images/store-card-13-airpods-nav-202409.png' %}" alt="Earphone" class="img-fluid mb-3" style="border-radius: 10px;">
-                <h6>Earphone</h6>
+                <a href="{% url 'earphone' %}" class="text-decoration-none">
+                    <img src="{% static 'images/store-card-13-airpods-nav-202409.png' %}" alt="Earphone" class="img-fluid mb-3" style="border-radius: 10px;">
+                    <h6>Earphone</h6>
+                </a>
             </div>
             <div class="col-md-2 category-item">
-                <img src="{% static 'images/store-card-13-accessories-nav-202503.png' %}" alt="Accessories" class="img-fluid mb-3" style="border-radius: 10px;">
-                <h6>Accessories</h6>
+                <a href="{% url 'accessory' %}" class="text-decoration-none">
+                    <img src="{% static 'images/store-card-13-accessories-nav-202503.png' %}" alt="Accessories" class="img-fluid mb-3" style="border-radius: 10px;">
+                    <h6>Accessories</h6>
+                </a>
             </div>
         </div>
 
-        <!-- 最新产品 -->
+        <!-- 最新产品品品 -->
         <div class="latest-products">
             <div class="latest-products-header">
                 <h2>The latest.</h2>
@@ -185,64 +195,72 @@
             <div class="row">
                 <div class="col-md-3 mb-4">
                     <div class="product-card product-card-1">
-                        <div class="product-image-wrapper">
-                            <img src="{% static 'images/store-card-40-macbook-air-202503.jpg' %}" alt="MacBook Air" class="product-image">
-                        </div>
-                        <div class="product-content">
-                            <div class="product-info">
-                                <h5 class="product-title">MacBook Air</h5>
-                                <p class="product-subtitle">With M4 chip</p>
-                                <p class="product-price">From ￡999</p>
+                        <a href="{% url 'notebook' %}" class="text-decoration-none">
+                            <div class="product-image-wrapper">
+                                <img src="{% static 'images/store-card-40-macbook-air-202503.jpg' %}" alt="MacBook Air" class="product-image">
                             </div>
-                        </div>
+                            <div class="product-content">
+                                <div class="product-info">
+                                    <h5 class="product-title">MacBook Air</h5>
+                                    <p class="product-subtitle">With M4 chip</p>
+                                    <p class="product-price">From ￡999</p>
+                                </div>
+                            </div>
+                        </a>
                     </div>
                 </div>
                 <div class="col-md-3 mb-4">
                     <div class="product-card product-card-2">
-                        <div class="product-image-wrapper">
-                            <img src="{% static 'images/store-card-40-ipad-air-202503.jpg' %}" alt="iPad Air" class="product-image">
-                        </div>
-                        <div class="product-content">
-                            <div class="product-info">
-                                <h5 class="product-title">iPad Air</h5>
-                                <p class="product-subtitle">With M3 chip</p>
-                                <p class="product-price">From ￡599</p>
+                        <a href="{% url 'tablet' %}" class="text-decoration-none">
+                            <div class="product-image-wrapper">
+                                <img src="{% static 'images/store-card-40-ipad-air-202503.jpg' %}" alt="iPad Air" class="product-image">
                             </div>
-                        </div>
+                            <div class="product-content">
+                                <div class="product-info">
+                                    <h5 class="product-title">iPad Air</h5>
+                                    <p class="product-subtitle">With M3 chip</p>
+                                    <p class="product-price">From ￡599</p>
+                                </div>
+                            </div>
+                        </a>
                     </div>
                 </div>
                 <div class="col-md-3 mb-4">
                     <div class="product-card product-card-3">
-                        <div class="product-image-wrapper">
-                            <img src="{% static 'images/store-card-40-iphone-16-pro-202409.jpg' %}" alt="iPhone 16 Pro" class="product-image">
-                        </div>
-                        <div class="product-content">
-                            <div class="product-info">
-                                <h5 class="product-title">iPhone 16 Pro</h5>
-                                <p class="product-subtitle">Apple Intelligence</p>
-                                <p class="product-price">From ￡999</p>
+                        <a href="{% url 'phone' %}" class="text-decoration-none">
+                            <div class="product-image-wrapper">
+                                <img src="{% static 'images/store-card-40-iphone-16-pro-202409.jpg' %}" alt="iPhone 16 Pro" class="product-image">
                             </div>
-                        </div>
+                            <div class="product-content">
+                                <div class="product-info">
+                                    <h5 class="product-title">iPhone 16 Pro</h5>
+                                    <p class="product-subtitle">Apple Intelligence</p>
+                                    <p class="product-price">From ￡999</p>
+                                </div>
+                            </div>
+                        </a>
                     </div>
                 </div>
                 <div class="col-md-3 mb-4">
                     <div class="product-card product-card-4">
-                        <div class="product-image-wrapper">
-                            <img src="{% static 'images/store-card-40-ipad-202503_GEO_GB.jpg' %}" alt="iPad" class="product-image">
-                        </div>
-                        <div class="product-content">
-                            <div class="product-info">
-                                <h5 class="product-title">iPad</h5>
-                                <p class="product-subtitle">With A16 chip</p>
-                                <p class="product-price">From ￡329</p>
+                        <a href="{% url 'tablet' %}" class="text-decoration-none">
+                            <div class="product-image-wrapper">
+                                <img src="{% static 'images/store-card-40-ipad-202503_GEO_GB.jpg' %}" alt="iPad" class="product-image">
                             </div>
-                        </div>
+                            <div class="product-content">
+                                <div class="product-info">
+                                    <h5 class="product-title">iPad</h5>
+                                    <p class="product-subtitle">With A16 chip</p>
+                                    <p class="product-price">From ￡329</p>
+                                </div>
+                            </div>
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 页脚 -->
+        <!-- 页脚脚脚 -->
         <footer class="footer mt-5">
             <div class="container">
                 <div class="row">
