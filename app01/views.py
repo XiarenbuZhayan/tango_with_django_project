@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -111,7 +111,105 @@ def my_orders(request):
     return render(request, 'my_orders.html')
 
 def bag(request):
-    return render(request, 'bag.html')
+    # 从session中获取购物车数据
+    cart_items = request.session.get('cart_items', [])
+    
+    # 计算总价，考虑商品数量
+    total_price = sum(item['price'] * item['quantity'] for item in cart_items)
+    
+    context = {
+        'cart_items': cart_items,
+        'total_price': total_price,
+        'items_count': len(cart_items)
+    }
+    
+    return render(request, 'bag.html', context)
+
+def add_to_bag(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            product_id = data.get('product_id')
+            product_name = data.get('product_name')
+            product_price = data.get('product_price')
+            product_image = data.get('product_image')
+            quantity = int(data.get('quantity', 1))
+            update_quantity = data.get('update_quantity', False)
+            
+            # 获取当前购物车或创建新购物车
+            cart_items = request.session.get('cart_items', [])
+            
+            # 如果是更新数量的请求
+            if update_quantity:
+                for item in cart_items:
+                    if item['id'] == product_id:
+                        item['quantity'] = quantity
+                        break
+            else:
+                # 检查商品是否已在购物车中
+                found = False
+                for item in cart_items:
+                    if item['id'] == product_id:
+                        item['quantity'] += quantity
+                        found = True
+                        break
+                
+                # 如果商品不在购物车中，添加它
+                if not found and product_price is not None:
+                    product_price = float(product_price)
+                    cart_items.append({
+                        'id': product_id,
+                        'name': product_name,
+                        'price': product_price,
+                        'image': product_image,
+                        'quantity': quantity
+                    })
+            
+            # 更新会话中的购物车
+            request.session['cart_items'] = cart_items
+            request.session.modified = True
+            
+            # 计算总价（包括数量）
+            total_price = sum(item['price'] * item['quantity'] for item in cart_items)
+            
+            return JsonResponse({
+                'success': True, 
+                'message': 'Product added to bag',
+                'items_count': len(cart_items),
+                'total_price': total_price
+            })
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+    
+    return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
+
+def remove_from_bag(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            product_id = data.get('product_id')
+            
+            # 获取当前购物车
+            cart_items = request.session.get('cart_items', [])
+            
+            # 移除指定商品
+            cart_items = [item for item in cart_items if item['id'] != product_id]
+            
+            # 更新会话中的购物车
+            request.session['cart_items'] = cart_items
+            request.session.modified = True
+            
+            return JsonResponse({
+                'success': True, 
+                'message': 'Product removed from bag',
+                'items_count': len(cart_items)
+            })
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+    
+    return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
 
 def phone_detail(request, phone_id):
     # 添加重定向逻辑
@@ -244,6 +342,30 @@ def accessory(request):
     View function for displaying accessory page
     """
     return render(request, 'accessory.html')
+
+def airtag(request):
+    return render(request, 'airtag.html')
+
+def magsafe_charger(request):
+    return render(request, 'magsafe_charger.html')
+    
+def apple_pencil(request):
+    return render(request, 'apple_pencil.html')
+
+def iphone_cases(request):
+    return render(request, 'iphone_cases.html')
+
+def magic_mouse(request):
+    return render(request, 'magic_mouse.html')
+    
+def magic_keyboard(request):
+    return render(request, 'magic_keyboard.html')
+
+def homepod_mini(request):
+    return render(request, 'homepod_mini.html')
+
+def airpods_pro(request):
+    return render(request, 'airpods_pro.html')
 
 def iphone16(request):
     """

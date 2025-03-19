@@ -73,6 +73,134 @@
             flex-direction: row;
             justify-content: flex-start;
         }
+        
+        /* 购物车项目样式 */
+        .cart-item {
+            display: flex;
+            padding: 20px 0;
+            border-bottom: 1px solid #d2d2d7;
+        }
+        
+        .cart-item-image {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            margin-right: 20px;
+        }
+        
+        .cart-item-info {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .cart-item-title {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        
+        .cart-item-price {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .cart-item-quantity {
+            display: flex;
+            align-items: center;
+        }
+        
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #d2d2d7;
+            background-color: #fff;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .quantity-input {
+            width: 40px;
+            height: 30px;
+            border: 1px solid #d2d2d7;
+            border-left: none;
+            border-right: none;
+            text-align: center;
+            font-size: 16px;
+        }
+        
+        .cart-actions {
+            display: flex;
+            align-items: flex-start;
+            margin-left: 20px;
+        }
+        
+        .remove-btn {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        .remove-btn:hover {
+            color: #333;
+        }
+        
+        .cart-summary {
+            background-color: #f5f5f7;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 20px;
+            font-weight: 600;
+            padding: 10px 0;
+        }
+        
+        .checkout-btn {
+            background-color: #0070c9;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 15px 0;
+            font-size: 17px;
+            font-weight: 500;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        
+        .checkout-btn:hover {
+            background-color: #0051a5;
+        }
+        
+        .shopping-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .back-to-shopping {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: #0070c9;
+            font-size: 14px;
+            margin-right: 20px;
+        }
+        
+        .back-to-shopping i {
+            margin-right: 5px;
+        }
     </style>
 </head>
 <body>
@@ -80,21 +208,158 @@
     {% include 'navbar.html' %}
 
     <div class="bag-container">
-        <h1 class="bag-title">Your bag is empty.</h1>
+        <div class="shopping-header">
+            <a href="{% url 'homepage' %}" class="back-to-shopping">
+                <i class="bi bi-chevron-left"></i> Shopping Continue
+            </a>
+        </div>
         
-        {% if user.is_authenticated %}
-            <p class="bag-message">You have no items in your bag.</p>
-            <div class="action-buttons vertical">
-                <a href="{% url 'homepage' %}" class="btn-base btn-continue">Continue Shopping</a>
+        {% if cart_items %}
+            <h1 class="bag-title">Your Bag total is £{{ total_price }}.</h1>
+            
+            <div class="cart-items">
+                {% for item in cart_items %}
+                <div class="cart-item" data-item-id="{{ item.id }}">
+                    <img src="{{ item.image }}" alt="{{ item.name }}" class="cart-item-image">
+                    
+                    <div class="cart-item-info">
+                        <div>
+                            <h3 class="cart-item-title">{{ item.name }}</h3>
+                            <p class="cart-item-price">£{{ item.price }}</p>
+                        </div>
+                        
+                        <div class="cart-item-quantity">
+                            <div class="quantity-selector">
+                                <select class="form-select quantity-select" data-item-id="{{ item.id }}" data-item-price="{{ item.price }}">
+                                    <option value="1" {% if item.quantity == 1 %}selected{% endif %}>1</option>
+                                    <option value="2" {% if item.quantity == 2 %}selected{% endif %}>2</option>
+                                    <option value="3" {% if item.quantity == 3 %}selected{% endif %}>3</option>
+                                    <option value="4" {% if item.quantity == 4 %}selected{% endif %}>4</option>
+                                    <option value="5" {% if item.quantity == 5 %}selected{% endif %}>5</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="cart-actions">
+                        <button class="remove-btn" onclick="removeFromBag('{{ item.id }}')">
+                            <i class="bi bi-trash3"></i>
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="cart-summary">
+                <div class="cart-total">
+                    <span>Total</span>
+                    <span>£{{ total_price }}</span>
+                </div>
+                <button class="checkout-btn">Check Out</button>
             </div>
         {% else %}
-            <p class="bag-message">Sign in to see if you have any saved items. Or continue shopping.</p>
-            <div class="action-buttons horizontal">
-                <a href="{% url 'signin' %}" class="btn-base btn-signin">Sign In</a>
-                <a href="{% url 'homepage' %}" class="btn-base btn-continue">Continue Shopping</a>
-            </div>
+            <h1 class="bag-title">Your bag is empty.</h1>
+            
+            {% if user.is_authenticated %}
+                <p class="bag-message">You have no items in your bag.</p>
+                <div class="action-buttons vertical">
+                    <a href="{% url 'homepage' %}" class="btn-base btn-continue">Continue Shopping</a>
+                </div>
+            {% else %}
+                <p class="bag-message">Sign in to see if you have any saved items. Or continue shopping.</p>
+                <div class="action-buttons horizontal">
+                    <a href="{% url 'signin' %}" class="btn-base btn-signin">Sign In</a>
+                    <a href="{% url 'homepage' %}" class="btn-base btn-continue">Continue Shopping</a>
+                </div>
+            {% endif %}
         {% endif %}
     </div>
+    
+    <script>
+    // 在文档加载完成后添加事件监听器
+    document.addEventListener('DOMContentLoaded', function() {
+        // 为所有数量选择器添加change事件监听
+        const quantitySelects = document.querySelectorAll('.quantity-select');
+        quantitySelects.forEach(select => {
+            select.addEventListener('change', updateQuantity);
+        });
+    });
+    
+    // 更新商品数量
+    function updateQuantity(e) {
+        const select = e.target;
+        const itemId = select.getAttribute('data-item-id');
+        const quantity = parseInt(select.value);
+        
+        fetch('{% url "add_to_bag" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                product_id: itemId,
+                quantity: quantity,
+                update_quantity: true // 标记这是一个更新数量的请求
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // 刷新页面显示更新后的购物车
+                location.reload();
+            } else {
+                alert('Failed to update quantity: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while updating the quantity');
+        });
+    }
+    
+    function removeFromBag(productId) {
+        fetch('{% url "remove_from_bag" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                product_id: productId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // 刷新页面显示更新后的购物车
+                location.reload();
+            } else {
+                alert('Failed to remove item: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while removing the item');
+        });
+    }
+    
+    // 获取CSRF令牌的函数
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    </script>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

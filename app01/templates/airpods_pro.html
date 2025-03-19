@@ -1,0 +1,474 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}AirPods Pro 2 - E-trade{% endblock %}
+
+{% block extra_css %}
+<style>
+    .main-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+    
+    .product-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 0;
+        border-bottom: 1px solid #d2d2d7;
+    }
+    
+    .product-title {
+        font-size: 24px;
+        font-weight: 600;
+        color: #1d1d1f;
+    }
+    
+    .overview-link {
+        color: #0071e3;
+        text-decoration: none;
+        font-size: 14px;
+    }
+    
+    .product-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        padding: 40px 0;
+    }
+    
+    .product-image-section {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 500px;
+    }
+    
+    .product-image {
+        max-width: 100%;
+        max-height: 450px;
+        object-fit: contain;
+        display: block;
+        margin: 0 auto;
+    }
+    
+    .product-details-section {
+        padding-top: 20px;
+    }
+    
+    .product-new {
+        color: #bf4800;
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+    
+    .product-name {
+        font-size: 42px;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: #1d1d1f;
+    }
+    
+    .product-description {
+        font-size: 18px;
+        color: #1d1d1f;
+        margin-bottom: 30px;
+        line-height: 1.4;
+    }
+    
+    .option-title {
+        font-size: 24px;
+        font-weight: 600;
+        color: #1d1d1f;
+        margin-bottom: 20px;
+    }
+    
+    .divider {
+        height: 1px;
+        background-color: #d2d2d7;
+        margin: 30px 0;
+    }
+    
+    .delivery-section, .pickup-section {
+        margin-bottom: 20px;
+    }
+    
+    .delivery-title, .pickup-title {
+        display: flex;
+        align-items: center;
+        font-size: 18px;
+        font-weight: 500;
+        margin-bottom: 10px;
+    }
+    
+    .delivery-icon, .pickup-icon {
+        margin-right: 10px;
+        font-size: 20px;
+        color: #1d1d1f;
+    }
+    
+    .delivery-info, .pickup-info {
+        color: #515154;
+        font-size: 16px;
+        margin-bottom: 5px;
+        margin-left: 30px;
+    }
+    
+    .delivery-link, .pickup-link {
+        color: #0071e3;
+        text-decoration: none;
+        font-size: 16px;
+        margin-left: 30px;
+        display: inline-block;
+        margin-top: 5px;
+    }
+    
+    .info-icon {
+        margin-left: 5px;
+        font-size: 14px;
+    }
+    
+    .icon-truck, .icon-store {
+        width: 24px;
+        height: 24px;
+        margin-right: 8px;
+    }
+    
+    .buy-button {
+        background-color: #0071e3;
+        color: #fff;
+        border: none;
+        border-radius: 980px;
+        padding: 12px 24px;
+        font-size: 17px;
+        font-weight: 400;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 30px;
+        transition: all 0.2s;
+    }
+    
+    .buy-button:hover {
+        background-color: #0077ed;
+    }
+    
+    .features-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 30px;
+        text-align: center;
+        background-color: #f5f5f7;
+        border-radius: 18px;
+        margin: 40px 0;
+    }
+    
+    .feature-item {
+        flex: 1;
+        padding: 0 20px;
+    }
+    
+    .feature-icon {
+        font-size: 24px;
+        margin-bottom: 15px;
+        color: #1d1d1f;
+    }
+    
+    .feature-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #1d1d1f;
+    }
+    
+    .feature-desc {
+        font-size: 14px;
+        color: #515154;
+        line-height: 1.4;
+    }
+    
+    .price-section {
+        margin: 20px 0;
+        text-align: left;
+    }
+    
+    .price {
+        font-size: 36px;
+        font-weight: 600;
+        color: #1d1d1f;
+    }
+    
+    .help-section {
+        text-align: center;
+        padding: 30px 0;
+        border-top: 1px solid #d2d2d7;
+        color: #515154;
+        font-size: 14px;
+    }
+    
+    .help-link {
+        color: #0071e3;
+        text-decoration: none;
+        margin-left: 5px;
+    }
+    
+    @media (max-width: 768px) {
+        .product-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .product-image-section {
+            order: 1;
+        }
+        
+        .product-details-section {
+            order: 2;
+        }
+        
+        .features-section {
+            flex-direction: column;
+        }
+        
+        .feature-item {
+            margin-bottom: 30px;
+        }
+    }
+    
+    .toast-container {
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        z-index: 1000;
+    }
+    
+    .custom-toast {
+        background-color: #fff;
+        color: #333;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border-radius: 8px;
+        padding: 15px 20px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: opacity 0.3s, transform 0.3s;
+    }
+    
+    .toast-success {
+        border-left: 4px solid #4CAF50;
+    }
+    
+    .toast-error {
+        border-left: 4px solid #F44336;
+    }
+    
+    .toast-icon {
+        margin-right: 10px;
+        font-size: 20px;
+    }
+    
+    .toast-success .toast-icon {
+        color: #4CAF50;
+    }
+    
+    .toast-error .toast-icon {
+        color: #F44336;
+    }
+    
+    .toast-message {
+        flex-grow: 1;
+    }
+    
+    .toast-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="main-container">
+    <div class="product-header">
+        <h1 class="product-title">AirPods Pro</h1>
+        <a href="#" class="overview-link">Overview</a>
+    </div>
+    
+    <div class="product-container">
+        <div class="product-image-section">
+            <img src="{% static 'images/airpods-pro-2nd-gen.png' %}" alt="AirPods Pro" class="product-image" id="main-image">
+        </div>
+        
+        <div class="product-details-section">
+            <p class="product-new">New</p>
+            <h2 class="product-name">AirPods Pro (2nd generation)</h2>
+            <p class="product-description">AirPods Pro (2nd generation) deliver up to 2x more Active Noise Cancellation, plus Adaptive Transparency, and Personalized Spatial Audio with dynamic head tracking for immersive sound. A more magical experience.</p>
+            
+            <h3 class="option-title">AirPods Pro with MagSafe Case (USB‑C)</h3>
+            
+            <div class="delivery-section">
+                <p class="delivery-title">
+                    <svg class="icon-truck" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="1" y="3" width="15" height="13"></rect>
+                        <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                        <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                        <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                    </svg>
+                    Delivery:
+                </p>
+                <p class="delivery-info">In stock</p>
+                <p class="delivery-info">Free Delivery</p>
+                <a href="#" class="delivery-link">Get delivery dates <span class="info-icon">ⓘ</span></a>
+            </div>
+            
+            <div class="pickup-section">
+                <p class="pickup-title">
+                    <svg class="icon-store" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    Pickup:
+                </p>
+                <a href="#" class="pickup-link">Check availability <span class="info-icon">ⓘ</span></a>
+            </div>
+            
+            <div class="price-section">
+                <span class="price">£249.00</span>
+            </div>
+            
+            <button id="add-to-bag-btn" class="buy-button">Add to Bag</button>
+        </div>
+    </div>
+    
+    <div class="features-section">
+        <div class="feature-item">
+            <div class="feature-icon">📦</div>
+            <h4 class="feature-title">Fast, free delivery</h4>
+            <p class="feature-desc">Or pick up available items at an Apple Store</p>
+        </div>
+        
+        <div class="feature-item">
+            <div class="feature-icon">🔊</div>
+            <h4 class="feature-title">Enhanced Active Noise Cancellation</h4>
+            <p class="feature-desc">Up to 2x more Active Noise Cancellation than the previous generation</p>
+        </div>
+        
+        <div class="feature-item">
+            <div class="feature-icon">↩️</div>
+            <h4 class="feature-title">Free and easy returns</h4>
+            <p class="feature-desc">Return items within 14 days for a full refund</p>
+        </div>
+    </div>
+    
+    <div class="help-section">
+        <p>Get help buying. <a href="#" class="help-link">Chat now</a> or call 0800 048 0408.</p>
+    </div>
+</div>
+
+<!-- Toast 通知容器 -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const addToBagBtn = document.getElementById('add-to-bag-btn');
+    
+    addToBagBtn.addEventListener('click', function() {
+        // 产品数据
+        const productData = {
+            product_id: 'airpods-pro',
+            product_name: 'AirPods Pro (2nd generation)',
+            product_price: 249.00,
+            product_image: '{% static "images/airpods-pro-2nd-gen.png" %}',
+            quantity: 1
+        };
+        
+        // 发送添加到购物车请求
+        fetch('{% url "add_to_bag" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify(productData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('success', 'Added to bag successfully!');
+                // 更新导航栏购物车图标的数量
+                updateCartCount(data.items_count);
+            } else {
+                showToast('error', 'Failed to add to bag: ' + data.message);
+            }
+        })
+        .catch(error => {
+            showToast('error', 'An error occurred: ' + error);
+            console.error('Error:', error);
+        });
+    });
+    
+    // 获取CSRF令牌的函数
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    // 显示通知的函数
+    function showToast(type, message) {
+        const toastContainer = document.getElementById('toast-container');
+        
+        // 创建通知元素
+        const toast = document.createElement('div');
+        toast.className = `custom-toast toast-${type}`;
+        
+        // 通知内容
+        toast.innerHTML = `
+            <div class="toast-icon">
+                ${type === 'success' ? '✓' : '✗'}
+            </div>
+            <div class="toast-message">${message}</div>
+        `;
+        
+        // 添加到容器
+        toastContainer.appendChild(toast);
+        
+        // 显示通知
+        setTimeout(() => {
+            toast.classList.add('toast-visible');
+        }, 10);
+        
+        // 3秒后自动移除
+        setTimeout(() => {
+            toast.classList.remove('toast-visible');
+            setTimeout(() => {
+                toastContainer.removeChild(toast);
+            }, 300);
+        }, 3000);
+    }
+    
+    // 更新购物车数量的函数
+    function updateCartCount(count) {
+        const cartCountElement = document.querySelector('.cart-count');
+        if (cartCountElement) {
+            cartCountElement.textContent = count;
+            
+            // 如果之前没有商品，显示购物车计数
+            if (count > 0 && cartCountElement.classList.contains('d-none')) {
+                cartCountElement.classList.remove('d-none');
+            }
+        }
+    }
+});
+</script>
+{% endblock %} 
