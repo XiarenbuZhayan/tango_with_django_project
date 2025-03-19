@@ -19,7 +19,24 @@ class Tablet(models.Model):
     storage = models.IntegerField()  # 存储容量，单位GB
     price = models.DecimalField(max_digits=10, decimal_places=2)  # 价格，支持两位小数
     stock = models.IntegerField(default=0)
-# class BagItem(models.Model):
+
+class Laptop(models.Model):
+    id = models.AutoField(primary_key=True, unique=True)  # 主键，Django 会自动创建
+    name = models.CharField(max_length=100)  # 设备名称，限制最大长度100字符
+    size = models.CharField(max_length=50)  # 尺寸，最大50字符
+    color = models.CharField(max_length=50)  # 颜色，最大50字符
+    memory = models.IntegerField()  # 内存，单位GBory = models.IntegerField()  # 内存，单位GB
+    storage = models.IntegerField()  # 存储容量，单位GB
+    price = models.DecimalField(max_digits=10, decimal_places=2)  # 价格，支持两位小数
+    stock = models.IntegerField(default=0)
+
+class Watch(models.Model):
+    id = models.AutoField(primary_key=True, unique=True)  # 主键，Django 会自动创建
+    name = models.CharField(max_length=100)  # 设备名称，限制最大长度100字符
+    case_color = models.CharField(max_length=50)  # 表盘，最大50字符
+    strap_color = models.CharField(max_length=50)  # 表带，最大50字符
+    price = models.DecimalField(max_digits=10, decimal_places=2)  # 价格，支持两位小数
+    stock = models.IntegerField(default=0) 
 #     bag_item_id = models.AutoField(primary_key=True)
 #     user = models.ForeignKey('User', on_delete=models.CASCADE)  # 关联用户
 #     phone = models.ForeignKey('Phone', on_delete=models.CASCADE)  # 关联手机商品

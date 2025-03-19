@@ -1,0 +1,357 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Apple Watch Ultra 2 - E-trade{% endblock %}
+
+{% block extra_css %}
+<style>
+.product-detail-container {
+    display: flex;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    gap: 40px;
+}
+
+.product-gallery {
+    flex: 1;
+    position: sticky;
+    top: 20px;
+    height: fit-content;
+}
+
+.main-image {
+    width: 100%;
+    aspect-ratio: 1;
+    background: #f5f5f7;
+    border-radius: 18px;
+    overflow: hidden;
+}
+
+.main-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.product-options {
+    flex: 1;
+    max-width: 500px;
+}
+
+.product-options h1 {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.price-display {
+    margin-bottom: 30px;
+}
+
+.current-price {
+    font-size: 24px;
+    font-weight: 600;
+    display: block;
+}
+
+.monthly-price {
+    color: #86868b;
+    font-size: 14px;
+}
+
+.section {
+    margin-bottom: 40px;
+}
+
+.section h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.subtitle {
+    color: #86868b;
+    font-size: 18px;
+    font-weight: normal;
+}
+
+.color-options {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.color-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.color-btn:hover {
+    transform: scale(1.1);
+}
+
+.color-btn.selected {
+    border-color: #0071e3;
+}
+
+.selected-color {
+    font-size: 14px;
+    color: #1d1d1f;
+    margin-bottom: 30px;
+}
+
+.summary-section {
+    background: #f5f5f7;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 40px;
+}
+
+.summary-content {
+    margin-bottom: 20px;
+}
+
+.summary-content h3 {
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+.summary-content p {
+    margin: 5px 0;
+    color: #86868b;
+}
+
+.add-to-cart-btn {
+    width: 100%;
+    padding: 15px;
+    background: #0071e3;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.add-to-cart-btn:hover {
+    background: #0077ed;
+}
+
+.add-to-cart-btn:disabled {
+    background: #999;
+    cursor: not-allowed;
+}
+
+.features-list {
+    margin-top: 40px;
+    border-top: 1px solid #d2d2d7;
+    padding-top: 30px;
+}
+
+.features-list h3 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.features-list ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.features-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid #d2d2d7;
+    font-size: 17px;
+    color: #1d1d1f;
+}
+
+.features-list li:last-child {
+    border-bottom: none;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="product-detail-container">
+    <div class="product-gallery">
+        <div class="main-image">
+            <img id="watch-image" src="{% static 'images/watch_ultra2_natural_titanium.png' %}" alt="{{ watch.name }}">
+        </div>
+    </div>
+    <div class="product-options">
+        <h1>{{ watch.name }}</h1>
+        <div class="price-display">
+            <span id="current-price" class="current-price">£{{ watch.price }}</span>
+            <span id="monthly-price" class="monthly-price">£{{ watch.monthly_price }}/mo. for 24 mo.*</span>
+        </div>
+
+        <div class="case-selection section">
+            <h2>Case. <span class="subtitle">Select a finish.</span></h2>
+            <div class="color-options">
+                {% for case in watch.cases %}
+                <button type="button" class="color-btn" data-case="{{ case.name }}" style="background-color: {{ case.hex_code }};" onclick="selectCase(this)"></button>
+                {% endfor %}
+            </div>
+            <p class="selected-color">Case - <span id="selected-case-text">Select a case</span></p>
+        </div>
+
+        <div class="strap-selection section" style="opacity: 0.5;">
+            <h2>Band. <span class="subtitle">Pick a strap or loop.</span></h2>
+            <div class="color-options">
+                {% for strap in watch.straps %}
+                <button type="button" class="color-btn" data-strap="{{ strap.name }}" style="background-color: {{ strap.hex_code }};" onclick="selectStrap(this)" disabled></button>
+                {% endfor %}
+            </div>
+            <p class="selected-color">Band - <span id="selected-strap-text">Select a case first</span></p>
+        </div>
+
+        <div class="summary-section">
+            <div class="summary-content">
+                <h3>Your new {{ watch.name }}</h3>
+                <p id="case-summary">Case: Please select a case</p>
+                <p id="strap-summary">Band: Select a case first</p>
+                <p id="total-price">Total: £{{ watch.price }}</p>
+            </div>
+            <button id="add-to-cart" class="add-to-cart-btn">Add to Bag</button>
+        </div>
+
+        <div class="features-list">
+            <h3>Key features</h3>
+            <ul>
+                {% for feature in watch.features %}
+                <li>{{ feature }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+let selectedCase = null;
+let selectedStrap = null;
+
+function selectCase(element) {
+    // 移除所有颜色按钮的selected类
+    document.querySelectorAll('.case-selection .color-btn').forEach(btn => btn.classList.remove('selected'));
+    
+    // 为选中的颜色按钮添加selected类
+    element.classList.add('selected');
+    
+    // 获取选中的颜色名称
+    selectedCase = element.getAttribute('data-case');
+    
+    // 更新选中的颜色文本
+    document.getElementById('selected-case-text').textContent = selectedCase;
+    
+    // 启用表带选择
+    enableStrapSelection();
+    
+    // 更新手表图片 - 只显示表盘
+    updateWatchImage();
+    
+    // 更新摘要
+    updateSummary();
+}
+
+function enableStrapSelection() {
+    // 启用表带选择区域
+    document.querySelector('.strap-selection').style.opacity = '1';
+    
+    // 启用所有表带按钮
+    document.querySelectorAll('.strap-selection .color-btn').forEach(btn => {
+        btn.disabled = false;
+    });
+    
+    // 更新表带文本提示
+    document.getElementById('selected-strap-text').textContent = 'Please select a band';
+    
+    // 重置已选择的表带
+    selectedStrap = null;
+    document.querySelectorAll('.strap-selection .color-btn').forEach(btn => {
+        btn.classList.remove('selected');
+    });
+}
+
+function selectStrap(element) {
+    if (!selectedCase) {
+        return; // 如果没有选择表盘，不允许选择表带
+    }
+    
+    // 移除所有颜色按钮的selected类
+    document.querySelectorAll('.strap-selection .color-btn').forEach(btn => btn.classList.remove('selected'));
+    
+    // 为选中的颜色按钮添加selected类
+    element.classList.add('selected');
+    
+    // 获取选中的颜色名称
+    selectedStrap = element.getAttribute('data-strap');
+    
+    // 更新选中的颜色文本
+    document.getElementById('selected-strap-text').textContent = selectedStrap;
+    
+    // 更新手表图片 - 显示表盘和表带的组合
+    updateWatchImage();
+    
+    // 更新摘要
+    updateSummary();
+}
+
+function updateWatchImage() {
+    const watchImage = document.getElementById('watch-image');
+    
+    // 转换表盘颜色名称为小写，并替换空格为下划线
+    const caseColor = selectedCase.toLowerCase().replace(/ /g, '_');
+    
+    if (selectedStrap) {
+        // 如果选择了表带，显示完整的表盘+表带组合图片
+        // 取表带颜色的最后一个词（例如：Alpine Loop - Orange => orange）
+        const strapParts = selectedStrap.split(' - ');
+        const strapColor = strapParts[strapParts.length - 1].toLowerCase().replace(/ /g, '_');
+        
+        // 构建图片路径 - 表盘和表带的组合
+        const basePath = 'images/watch_ultra2_' + caseColor + '_' + strapColor + '.png';
+        watchImage.src = "{% static 'images/' %}" + basePath.substring(7);
+    } else {
+        // 如果只选择了表盘，只显示表盘图片
+        const basePath = 'images/watch_ultra2_' + caseColor + '.png';
+        watchImage.src = "{% static 'images/' %}" + basePath.substring(7);
+    }
+}
+
+function updateSummary() {
+    // 更新摘要信息
+    if (selectedCase) {
+        document.getElementById('case-summary').textContent = `Case: ${selectedCase}`;
+    } else {
+        document.getElementById('case-summary').textContent = 'Case: Please select a case';
+    }
+    
+    if (selectedStrap) {
+        document.getElementById('strap-summary').textContent = `Band: ${selectedStrap}`;
+    } else {
+        document.getElementById('strap-summary').textContent = selectedCase ? 'Band: Please select a band' : 'Band: Select a case first';
+    }
+}
+
+// 页面加载时初始化
+document.addEventListener('DOMContentLoaded', function() {
+    // 初始状态下不选择任何表盘和表带
+    selectedCase = null;
+    selectedStrap = null;
+    
+    // 更新摘要
+    document.getElementById('case-summary').textContent = 'Case: Please select a case';
+    document.getElementById('strap-summary').textContent = 'Band: Select a case first';
+    
+    // 禁用表带选择
+    document.querySelector('.strap-selection').style.opacity = '0.5';
+    document.querySelectorAll('.strap-selection .color-btn').forEach(btn => {
+        btn.disabled = true;
+    });
+});
+</script>
+{% endblock %} 

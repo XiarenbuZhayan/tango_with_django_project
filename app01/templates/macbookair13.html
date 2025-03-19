@@ -1,0 +1,418 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}MacBook Air 13" - E-trade{% endblock %}
+
+{% block extra_css %}
+<style>
+.product-detail-container {
+    display: flex;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    gap: 40px;
+}
+
+.product-gallery {
+    flex: 1;
+    position: sticky;
+    top: 20px;
+    height: fit-content;
+}
+
+.main-image {
+    width: 100%;
+    aspect-ratio: 1;
+    background: #f5f5f7;
+    border-radius: 18px;
+    overflow: hidden;
+}
+
+.main-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.product-options {
+    flex: 1;
+    max-width: 500px;
+}
+
+.product-options h1 {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.price-display {
+    margin-bottom: 30px;
+}
+
+.current-price {
+    font-size: 24px;
+    font-weight: 600;
+    display: block;
+}
+
+.monthly-price {
+    color: #86868b;
+    font-size: 14px;
+}
+
+.section {
+    margin-bottom: 40px;
+}
+
+.section h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.subtitle {
+    color: #86868b;
+    font-size: 18px;
+    font-weight: normal;
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+.option {
+    border: 1px solid #d2d2d7;
+    border-radius: 12px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.option:hover {
+    border-color: #0071e3;
+}
+
+.option.selected {
+    border-color: #0071e3;
+    background-color: #f5f5f7;
+}
+
+.option h3 {
+    font-size: 17px;
+    margin-bottom: 5px;
+}
+
+.option-desc {
+    color: #86868b;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.option-price {
+    font-size: 14px;
+    color: #1d1d1f;
+}
+
+.color-options {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.color-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.color-btn:hover {
+    transform: scale(1.1);
+}
+
+.color-btn.selected {
+    border-color: #0071e3;
+}
+
+.selected-color {
+    font-size: 14px;
+    color: #1d1d1f;
+}
+
+.memory-options, .storage-options {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
+
+.memory-option, .storage-option {
+    border: 1px solid #d2d2d7;
+    border-radius: 12px;
+    padding: 15px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.memory-option:hover, .storage-option:hover {
+    border-color: #0071e3;
+}
+
+.memory-option.selected, .storage-option.selected {
+    border-color: #0071e3;
+    background-color: #f5f5f7;
+}
+
+.memory-size, .storage-size {
+    font-weight: 600;
+}
+
+.memory-price, .storage-price {
+    color: #86868b;
+}
+
+.model-info h2 {
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #1d1d1f;
+}
+
+.model-info p {
+    font-size: 17px;
+    line-height: 1.5;
+    color: #1d1d1f;
+    margin-bottom: 8px;
+}
+
+.summary-section {
+    background: #f5f5f7;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 40px;
+}
+
+.summary-content {
+    margin-bottom: 20px;
+}
+
+.summary-content h3 {
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+.summary-content p {
+    margin: 5px 0;
+    color: #86868b;
+}
+
+.add-to-cart-btn {
+    width: 100%;
+    padding: 15px;
+    background: #0071e3;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.add-to-cart-btn:hover {
+    background: #0077ed;
+}
+
+.add-to-cart-btn:disabled {
+    background: #999;
+    cursor: not-allowed;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="product-detail-container">
+    <div class="product-gallery">
+        <div class="main-image">
+            <img id="laptop-image" src="{% static laptop.image %}" alt="{{ laptop.name }}">
+        </div>
+    </div>
+    <div class="product-options">
+        <h1 id="laptop-title">{{ laptop.name }}</h1>
+        <div class="price-display">
+            <span id="current-price" class="current-price">From £{{ laptop.price }}</span>
+            <span id="monthly-price" class="monthly-price">From £{{ laptop.monthly_price }}/mo. for 24 mo.*</span>
+        </div>
+
+        <div class="model-info section">
+            <h2>MacBook Air 13"</h2>
+            <p>13.6-inch Liquid Retina display</p>
+            <p>M3 chip</p>
+            <p>Up to 24GB unified memory</p>
+            <p>Up to 2TB storage</p>
+        </div>
+
+        <div class="color-selection section">
+            <h2>Color. <span class="subtitle">Pick your favourite.</span></h2>
+            <div class="color-options">
+                {% for color in laptop.colors %}
+                <button type="button" class="color-btn" data-color="{{ color.name }}" style="background-color: {{ color.hex_code }};" onclick="selectColor(this)"></button>
+                {% endfor %}
+            </div>
+            <p class="selected-color">Color - <span id="selected-color-text">Select a color</span></p>
+        </div>
+
+        <div class="memory-selection section">
+            <h2>Memory. <span class="subtitle">How much do you need?</span></h2>
+            <div class="memory-options">
+                {% for memory in laptop.memory_options %}
+                <div class="memory-option" data-memory="{{ memory.size }}" data-price="{{ memory.price }}" onclick="selectMemory(this)">
+                    <div class="memory-size">{{ memory.size }}GB unified memory</div>
+                    <div class="memory-price">{% if memory.price_diff > 0 %}+£{{ memory.price_diff }}{% else %}Included{% endif %}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="storage-selection section">
+            <h2>Storage. <span class="subtitle">How much space do you need?</span></h2>
+            <div class="storage-options">
+                {% for storage in laptop.storage_options %}
+                <div class="storage-option" data-storage="{{ storage.size }}" data-price="{{ storage.price }}" onclick="selectStorage(this)">
+                    <div class="storage-size">{% if storage.size == '1T' or storage.size == '2T' %}{{ storage.size }} SSD{% else %}{{ storage.size }}GB SSD{% endif %}</div>
+                    <div class="storage-price">{% if storage.price_diff > 0 %}+£{{ storage.price_diff }}{% else %}Included{% endif %}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="summary-section">
+            <div class="summary-content">
+                <h3>Your new {{ laptop.name }}</h3>
+                <p id="color-summary">Color: Select a color</p>
+                <p id="memory-summary">Memory: Select memory</p>
+                <p id="storage-summary">Storage: Select storage</p>
+                <p id="total-price">Total: £{{ laptop.price }}</p>
+            </div>
+            <button id="add-to-cart" class="add-to-cart-btn" disabled>Add to Bag</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function selectColor(element) {
+    // 移除所有颜色按钮的selected类
+    document.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('selected'));
+    
+    // 为选中的颜色按钮添加selected类
+    element.classList.add('selected');
+    
+    // 获取选中的颜色名称
+    const colorName = element.getAttribute('data-color');
+    
+    // 更新选中的颜色文本
+    document.getElementById('selected-color-text').textContent = colorName;
+    
+    // 更新笔记本电脑图片
+    const laptopImage = document.getElementById('laptop-image');
+    
+    // 根据颜色名称设置正确的图片路径
+    let imagePath = '';
+    if (colorName === 'Midnight') {
+        imagePath = 'images/macbook_air_13_midnight.png';
+    } else if (colorName === 'Sky Blue') {
+        imagePath = 'images/macbook_air_13_sky_blue.png';
+    } else {
+        // 默认图片
+        imagePath = 'images/macbookair13.png';
+    }
+    
+    // 设置图片路径
+    laptopImage.src = "{% static '' %}" + imagePath;
+    
+    // 更新摘要
+    updateSummary();
+}
+
+function selectMemory(element) {
+    // 移除所有内存选项的selected类
+    document.querySelectorAll('.memory-option').forEach(opt => opt.classList.remove('selected'));
+    
+    // 为选中的内存选项添加selected类
+    element.classList.add('selected');
+    
+    // 更新摘要
+    updateSummary();
+}
+
+function selectStorage(element) {
+    // 移除所有存储选项的selected类
+    document.querySelectorAll('.storage-option').forEach(opt => opt.classList.remove('selected'));
+    
+    // 为选中的存储选项添加selected类
+    element.classList.add('selected');
+    
+    // 更新摘要
+    updateSummary();
+}
+
+function updateSummary() {
+    const selectedColor = document.querySelector('.color-btn.selected');
+    const selectedMemory = document.querySelector('.memory-option.selected');
+    const selectedStorage = document.querySelector('.storage-option.selected');
+    
+    // 更新摘要信息
+    document.getElementById('color-summary').textContent = `Color: ${selectedColor ? selectedColor.getAttribute('data-color') : 'Select a color'}`;
+    document.getElementById('memory-summary').textContent = `Memory: ${selectedMemory ? selectedMemory.getAttribute('data-memory') + 'GB' : 'Select memory'}`;
+    
+    // 对于存储，处理显示
+    let storageText = 'Select storage';
+    if (selectedStorage) {
+        const storageSize = selectedStorage.getAttribute('data-storage');
+        storageText = `Storage: ${storageSize}`;
+        if (!storageSize.includes('T')) {
+            storageText += 'GB';
+        }
+        storageText += ' SSD';
+    }
+    document.getElementById('storage-summary').textContent = storageText;
+    
+    // 计算总价
+    let basePrice = {{ laptop.price }};
+    let totalPrice = basePrice;
+    
+    // 如果选择了内存，加上内存的额外价格
+    if (selectedMemory) {
+        const memoryPriceDiff = parseInt(selectedMemory.getAttribute('data-price')) - basePrice;
+        if (memoryPriceDiff > 0) {
+            totalPrice += memoryPriceDiff;
+        }
+    }
+    
+    // 如果选择了存储，加上存储的额外价格
+    if (selectedStorage) {
+        const storagePriceDiff = parseInt(selectedStorage.getAttribute('data-price')) - basePrice;
+        if (storagePriceDiff > 0) {
+            totalPrice += storagePriceDiff;
+        }
+    }
+    
+    // 更新总价格
+    document.getElementById('total-price').textContent = `Total: £${totalPrice.toFixed(2)}`;
+    
+    // 检查是否可以启用"添加到购物车"按钮
+    const addToCartBtn = document.getElementById('add-to-cart');
+    addToCartBtn.disabled = !(selectedColor && selectedMemory && selectedStorage);
+}
+
+// 页面加载时初始化
+document.addEventListener('DOMContentLoaded', function() {
+    // 初始化摘要
+    updateSummary();
+});
+</script>
+{% endblock %} 

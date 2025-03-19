@@ -96,7 +96,7 @@ def signup(request):
     
     return render(request, 'signup.html')
 
-def logout(request):
+def signout(request):
     auth_logout(request)
     return redirect('homepage')
 
@@ -129,17 +129,115 @@ def tablet(request):
     """
     return render(request, 'tablet.html')
 
-def notebook(request):
-    """
-    View function for displaying notebook page
-    """
-    return render(request, 'notebook.html')
+def laptop(request):
+    return render(request, 'laptop.html')
 
-def earphone(request):
+def watch(request):
     """
-    View function for displaying earphone page
+    View function for displaying watch page
     """
-    return render(request, 'earphone.html')
+    return render(request, 'watch.html')
+
+def watch_se(request):
+    """
+    View function for displaying Apple Watch SE detail page
+    """
+    # Apple Watch SE数据
+    watch_data = {
+        'name': 'Apple Watch SE',
+        'price': 219,
+        'monthly_price': 10.38,
+        'cases': [
+            {'name': 'Midnight', 'hex_code': '#171e2b'},
+            {'name': 'Starlight', 'hex_code': '#e9d7c7'},
+            {'name': 'Silver', 'hex_code': '#d1d5db'},
+        ],
+        'straps': [
+            {'name': 'Solo Loop - Northern Lights', 'hex_code': '#aef69c'},
+            {'name': 'Solo Loop - Periwinkle', 'hex_code': '#7683b9'},
+            {'name': 'Solo Loop - Peony', 'hex_code': '#f47da1'},
+        ],
+        'features': [
+            '44mm or 40mm aluminum case',
+            'Retina display (Up to 1,000 nits)',
+            'S8 SiP processor',
+            'High and low heart rate notifications',
+            'Emergency SOS',
+            'Crash Detection',
+            'Water resistant 50 meters'
+        ],
+        'base_image': 'images/watch_se'
+    }
+    
+    return render(request, 'watch_se.html', {'watch': watch_data})
+
+def watch_series_10(request):
+    """
+    View function for displaying Apple Watch Series 10 detail page
+    """
+    # Apple Watch Series 10数据
+    watch_data = {
+        'name': 'Apple Watch Series 10',
+        'price': 399,
+        'monthly_price': 16.63,
+        'cases': [
+            {'name': 'Silver', 'hex_code': '#d1d5db'},
+            {'name': 'Rose Gold', 'hex_code': '#e9c7c7'},
+            {'name': 'Jet Black', 'hex_code': '#1a1a1a'}
+        ],
+        'straps': [
+            {'name': 'Solo Loop - Northern Lights', 'hex_code': '#aef69c'},
+            {'name': 'Solo Loop - Periwinkle', 'hex_code': '#7683b9'},
+            {'name': 'Solo Loop - Peony', 'hex_code': '#f47da1'},
+        ],
+        'features': [
+            '46mm or 42mm aluminum or titanium case',
+            'Always-On Retina display (Up to 2,000 nits)',
+            'S10 SiP processor',
+            'ECG app and Blood Oxygen app',
+            'High and low heart rate notifications',
+            'Temperature sensing',
+            'Crash Detection and Fall Detection',
+            'Water resistant 50 meters'
+        ],
+        'base_image': 'images/watch_series_10'
+    }
+    
+    return render(request, 'watch_series_10.html', {'watch': watch_data})
+
+def watch_ultra_2(request):
+    """
+    View function for displaying Apple Watch Ultra 2 detail page
+    """
+    # Apple Watch Ultra 2数据
+    watch_data = {
+        'name': 'Apple Watch Ultra 2',
+        'price': 799,
+        'monthly_price': 33.29,
+        'cases': [
+            {'name': 'Natural Titanium', 'hex_code': '#dbd3c8'},
+            {'name': 'Black Titanium', 'hex_code': '#2c2c2e'}
+        ],
+        'straps': [
+            {'name': 'Alpine Loop - Tan', 'hex_code': '#C19A6B'},
+            {'name': 'Alpine Loop - Navy', 'hex_code': '#2B2D42'},
+            {'name': 'Alpine Loop - Dark Gray', 'hex_code': '#3A4A3F'}
+        ],
+        'features': [
+            '49mm titanium case',
+            'Always-On Retina display (Up to 3,000 nits)',
+            'S9 SiP processor',
+            'ECG app and Blood Oxygen app',
+            'Temperature sensing',
+            'Depth gauge and water temperature sensor',
+            'Customizable Action button',
+            'Up to 36 hours of battery life',
+            'Water resistant 100 meters'
+        ],
+        'base_image': 'images/watch_ultra_2'
+    }
+    
+    return render(request, 'watch_ultra_2.html', {'watch': watch_data})
 
 def accessory(request):
     """
@@ -364,3 +462,96 @@ def ipadmini(request):
     }
     
     return render(request, 'ipadmini.html', {'tablet': tablet_data})
+
+def macbookpro16(request):
+    laptop = {
+        'name': 'MacBook Pro 16"',
+        'size': '16-inch',
+        'price': 5199,
+        'monthly_price': 216.62,
+        'image': 'images/macbook_pro_16.png',
+        'colors': [
+            {'name': 'Space Black', 'hex_code': '#1D1D1F'},
+            {'name': 'Silver', 'hex_code': '#F5F5F7'}
+        ],
+        'memory_options': [
+            {'size': 64, 'price': 0},
+            {'size': 128, 'price': 800}
+        ],
+        'storage_options': [
+            {'size': '4TB', 'price': 0},
+            {'size': '8TB', 'price': 1200}
+        ]
+    }
+    return render(request, 'macbookpro16.html', {'laptop': laptop})
+
+def macbookpro14(request):
+    laptop_data = {
+        'name': 'MacBook Pro 14"',
+        'size': '14-inch',
+        'price': 1999,
+        'monthly_price': 83.29,
+        'image': 'images/macbookpro14.png',
+        'colors': [
+            {'name': 'Space Black', 'hex_code': '#1d1d1f'},
+            {'name': 'Silver', 'hex_code': '#e3e3e1'},
+        ],
+        'memory_options': [
+            {'size': 16, 'price': 1999, 'price_diff': 0},
+            {'size': 24, 'price': 2199, 'price_diff': 200},
+            {'size': 32, 'price': 2399, 'price_diff': 400},
+        ],
+        'storage_options': [
+            {'size': '1TB', 'price': 1999, 'price_diff': 0},
+            {'size': '2TB', 'price': 2399, 'price_diff': 400},
+        ],
+    }
+    return render(request, 'macbookpro14.html', {'laptop': laptop_data})
+
+def macbookair13(request):
+    laptop_data = {
+        'name': 'MacBook Air 13"',
+        'size': '13.6-inch',
+        'price': 1199,
+        'monthly_price': 49.96,
+        'image': 'images/macbookair13.png',
+        'colors': [
+            {'name': 'Midnight', 'hex_code': '#1d1d1f'},
+            {'name': 'Sky Blue', 'hex_code': '#64a9d9'},
+        ],
+        'memory_options': [
+            {'size': 8, 'price': 1199, 'price_diff': 0},
+            {'size': 16, 'price': 1399, 'price_diff': 200},
+            {'size': 24, 'price': 1599, 'price_diff': 400},
+        ],
+        'storage_options': [
+            {'size': 512, 'price': 1199, 'price_diff': 0},
+            {'size': '1TB', 'price': 1499, 'price_diff': 200},
+            {'size': '2TB', 'price': 1999, 'price_diff': 400},
+        ],
+    }
+    return render(request, 'macbookair13.html', {'laptop': laptop_data})
+
+def macbookair15(request):
+    laptop_data = {
+        'name': 'MacBook Air 15"',
+        'size': '15.3-inch',
+        'price': 1399,
+        'monthly_price': 58.29,
+        'image': 'images/macbookair15.png',
+        'colors': [
+            {'name': 'Midnight', 'hex_code': '#1d1d1f'},
+            {'name': 'Sky Blue', 'hex_code': '#64a9d9'},
+        ],
+        'memory_options': [
+            {'size': 16, 'price': 1399, 'price_diff': 0},
+            {'size': 24, 'price': 1599, 'price_diff': 200},
+            {'size': 32, 'price': 1799, 'price_diff': 400},
+        ],
+        'storage_options': [
+            {'size': 512, 'price': 1399, 'price_diff': 0},
+            {'size': '1TB', 'price': 1599, 'price_diff': 200},
+            {'size': '2TB', 'price': 1999, 'price_diff': 600},
+        ],
+    }
+    return render(request, 'macbookair15.html', {'laptop': laptop_data})
