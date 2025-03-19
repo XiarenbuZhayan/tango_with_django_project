@@ -1,913 +1,378 @@
+{% extends 'base.html' %}
 {% load static %}
 
-<!DOCTYPE html>
-
-<html lang="en">
-
-<head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>E-trade - Phone</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
-
-    <script src="{% static 'javascript/auth.js' %}"></script>
-
-    <style>
-
-        body {
-
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-
-            color: #1d1d1f;
-
-            background-color: #fff;
-
-        }
-
-        .hero-section {
-
-            background-color: #fff;
-
-            color: #1d1d1f;
-
-            padding: 60px 0;
-
-            text-align: center;
-
-            border-bottom: 1px solid #f5f5f7;
-
-        }
-
-        .hero-title {
-
-            font-size: 56px;
-
-            font-weight: 600;
-
-            margin-bottom: 20px;
-
-        }
-
-        .hero-subtitle {
-
-            font-size: 28px;
-
-            font-weight: 400;
-
-            margin-bottom: 30px;
-
-            color: #86868b;
-
-        }
-
-        .hero-price {
-
-            font-size: 24px;
-
-            margin-bottom: 30px;
-
-        }
-
-        .btn-buy {
-
-            background-color: #0071e3;
-
-            color: #fff;
-
-            border: none;
-
-            border-radius: 980px;
-
-            padding: 12px 24px;
-
-            font-size: 17px;
-
-            font-weight: 400;
-
-            transition: all 0.2s;
-
-        }
-
-        .btn-buy:hover {
-
-            background-color: #0077ed;
-
-            color: #fff;
-
-        }
-
-        .video-container {
-
-            width: 100%;
-
-            max-width: 100%;
-
-            margin: 0 auto;
-
-            position: relative;
-
-            overflow: hidden;
-
-            background-color: #000;
-
-            /* è®¾ç½®è§é¢å®¹å¨çå®½é«æ¯ä¸º16:9ï¼æ¥è¿3200:1800çæ¯ä¾ï¼ */
-
-            aspect-ratio: 16/9;
-
-        }
-
-        .video-container video {
-
-            width: 100%;
-
-            height: 100%;
-
-            object-fit: cover;
-
-            display: block;
-
-        }
-
-        /* æ·»å è§é¢å°ºå¯¸ä¿¡æ¯ */
-
-        .video-info {
-
-            position: absolute;
-
-            bottom: 10px;
-
-            right: 10px;
-
-            background-color: rgba(0, 0, 0, 0.5);
-
-            color: white;
-
-            padding: 5px 10px;
-
-            border-radius: 4px;
-
-            font-size: 12px;
-
-            z-index: 10;
-
-        }
-
-        .features-section {
-
-            padding: 80px 0;
-
-            text-align: center;
-
-        }
-
-        .feature-title {
-
-            font-size: 48px;
-
-            font-weight: 600;
-
-            margin-bottom: 20px;
-
-        }
-
-        .feature-description {
-
-            font-size: 24px;
-
-            color: #86868b;
-
-            max-width: 800px;
-
-            margin: 0 auto 40px;
-
-        }
-
-        .footer {
-
-            background: #f5f5f7;
-
-            padding: 40px 0;
-
-            margin-top: 50px;
-
-        }
-
-        /* æ·»å å¨å±æé®æ ·å¼ */
-
-        .fullscreen-btn {
-
-            position: absolute;
-
-            bottom: 10px;
-
-            left: 10px;
-
-            background-color: rgba(0, 0, 0, 0.5);
-
-            color: white;
-
-            border: none;
-
-            padding: 5px 10px;
-
-            border-radius: 4px;
-
-            cursor: pointer;
-
-            z-index: 10;
-
-        }
-
-        .fullscreen-btn:hover {
-
-            background-color: rgba(0, 0, 0, 0.7);
-
-        }
-
-        /* ææºé¢è§é¨åæ ·å¼ */
-
-        .phone-comparison {
-
-            padding: 80px 0;
-
-            background-color: #fff;
-
-            overflow-x: hidden;
-
-            width: 100%;
-
-        }
-
-        .phone-card {
-
-            text-align: center;
-
-            margin-bottom: 40px;
-
-            padding: 0 15px;
-
-        }
-
-        .phone-image-container {
-
-            height: 580px;
-
-            display: flex;
-
-            align-items: flex-end;
-
-            justify-content: center;
-
-            margin: 0 auto;
-
-            margin-bottom: 30px;
-
-        }
-
-        .phone-image {
-
-            max-width: 100%;
-
-            max-height: 580px;
-
-            width: auto;
-
-            height: auto;
-
-            object-fit: contain;
-
-        }
-
-        .phone-comparison .container-fluid {
-
-            padding: 0 30px;
-
-        }
-
-        .phone-comparison .row {
-
-            margin: 0 -15px;
-
-        }
-
-        .color-options {
-
-            display: flex;
-
-            justify-content: center;
-
-            margin-bottom: 20px;
-
-        }
-
-        .color-option {
-
-            width: 20px;
-
-            height: 20px;
-
-            border-radius: 50%;
-
-            margin: 0 5px;
-
-            cursor: pointer;
-
-            border: 1px solid #e0e0e0;
-
-        }
-
-        .color-option.active {
-
-            box-shadow: 0 0 0 2px #0071e3;
-
-        }
-
-        .phone-title {
-
-            font-size: 24px;
-
-            font-weight: 600;
-
-            margin-bottom: 5px;
-
-        }
-
-        .phone-tagline {
-
-            font-size: 16px;
-
-            color: #86868b;
-
-            margin-bottom: 10px;
-
-        }
-
-        .phone-price {
-
-            font-size: 16px;
-
-            margin-bottom: 15px;
-
-        }
-
-        .phone-price-details {
-
-            font-size: 14px;
-
-            color: #86868b;
-
-            margin-bottom: 20px;
-
-        }
-
-        .action-buttons {
-
-            display: flex;
-
-            justify-content: center;
-
-            gap: 10px;
-
-        }
-
-        .btn-learn-more {
-
-            background: linear-gradient(to right, #0071e3, #42a5f5);
-
-            color: white;
-
-            border: none;
-
-            border-radius: 20px;
-
-            padding: 8px 20px;
-
-            font-size: 14px;
-
-        }
-
-        .btn-buy-link {
-
-            color: #0071e3;
-
-            text-decoration: none;
-
-            font-size: 14px;
-
-            display: flex;
-
-            align-items: center;
-
-        }
-
-        .btn-buy-link:hover {
-
-            text-decoration: underline;
-
-        }
-
-        .new-badge {
-
-            display: inline-block;
-
-            color: #f56300;
-
-            font-size: 14px;
-
-            margin-bottom: 5px;
-
-        }
-
-    </style>
-
-</head>
-
-<body>
-
-    <!-- 导航栏 -->
-
-    {% include 'navbar.html' %}
-
-
-
-    <!-- 英雄区域 -->
-
-    <section class="hero-section">
-
-        <div class="container">
-
-            <h1 class="hero-title">iPhone 16 Pro</h1>
-
-            <p class="hero-subtitle">Advanced, Powerful, Beyond Imagination</p>
-
-            <p class="hero-price">From £999</p>
-
-            <button class="btn btn-buy">Buy Now</button>
-
-        </div>
-
-    </section>
-
-
-
-    <!-- 视频区域 -->
-
-    <div class="video-container">
-
-        <video id="phoneVideo" autoplay muted loop playsinline poster="{% static 'images/iphone_poster.jpg' %}" width="3200" height="1800">
-
-            <source src="{% static 'videos/xlarge_2x.mp4' %}" type="video/mp4">
-
-            Your browser does not support the video tag.
-
-        </video>
-
-        <div class="video-info">3200 x 1800</div>
-
-        <button class="fullscreen-btn" onclick="toggleFullScreen()"><i class="bi bi-fullscreen"></i></button>
-
+{% block content %}
+<!-- 英雄区域 -->
+<section class="hero-section">
+    <div class="container">
+        <h1 class="hero-title">iPhone 16 Pro</h1>
+        <p class="hero-subtitle">Advanced, Powerful, Beyond Imagination</p>
+        <p class="hero-price">From £1099</p>
+        <a href="{% url 'iphone16pro' %}" class="btn btn-buy">Buy Now</a>
     </div>
+</section>
 
+<!-- 视频区域 -->
+<div class="video-container">
+    <video id="phoneVideo" autoplay muted loop playsinline poster="{% static 'images/iphone_poster.jpg' %}" width="3200" height="1800">
+        <source src="{% static 'videos/xlarge_2x.mp4' %}" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <div class="video-info">3200 x 1800</div>
+    <button class="fullscreen-btn" onclick="toggleFullScreen()"><i class="bi bi-fullscreen"></i></button>
+</div>
 
-
-    <!-- 手机对比区域 -->
-
-    <section class="phone-comparison">
-
-        <div class="container-fluid">
-
-            <div class="row">
-
-                <!-- iPhone 16 Pro -->
-
-                <div class="col-lg-3 col-md-6">
-
-                    <div class="phone-card">
-
-                        <div class="phone-image-container">
-
-                            <img src="{% static 'images/iphone_16pro__erw9alves2qa_xlarge_2x.png' %}" alt="iPhone 16 Pro" class="phone-image">
-
-                        </div>
-
-                        <div class="color-options">
-
-                            <div class="color-option active" style="background-color: #e3ccb4;" title="Natural Titanium"></div>
-
-                            <div class="color-option" style="background-color: #f0e8d6;" title="White Titanium"></div>
-
-                            <div class="color-option" style="background-color: #f5f5f7;" title="Silver Titanium"></div>
-
-                            <div class="color-option" style="background-color: #232324;" title="Black Titanium"></div>
-
-                        </div>
-
-                        <h3 class="phone-title">iPhone 16 Pro</h3>
-
-                        <p class="phone-tagline">The ultimate iPhone.</p>
-
-                        <p class="phone-price">From £999</p>
-
-                        <p class="phone-price-details">or £41.62/mo. for 24 mo.</p>
-
-                        <div class="action-buttons">
-
-                            <button class="btn-learn-more">Learn more</button>
-
-                            <a href="{% url 'phone_detail' 'iphone16pro' %}" class="btn-buy-link">Buy <i class="bi bi-chevron-right"></i></a>
-
-                        </div>
-
+<!-- 手机对比区域 -->
+<div class="container mt-5">
+    <div class="row">
+        <!-- iPhone 16 Pro Max -->
+        <div class="col-md-3">
+            <div class="product-card">
+                <img src="{% static 'images/iphone_16pro__erw9alves2qa_xlarge_2x.png' %}" alt="iPhone 16 Pro Max" class="product-image">
+                <div class="product-info">
+                    <h3>iPhone 16 Pro Max</h3>
+                    <p class="tagline">The ultimate iPhone.</p>
+                    <p class="price">From £1199</p>
+                    <p class="monthly">£49.95/mo. for 24 mo.*</p>
+                    <div class="color-options">
+                        <span class="color-dot" style="background-color: #C1B6A5;"></span>
+                        <span class="color-dot" style="background-color: #E3D0B8;"></span>
+                        <span class="color-dot" style="background-color: #F5F5F7;"></span>
+                        <span class="color-dot" style="background-color: #4C4C4C;"></span>
                     </div>
-
-                </div>
-
-                
-
-                <!-- iPhone 16 -->
-
-                <div class="col-lg-3 col-md-6">
-
-                    <div class="phone-card">
-
-                        <div class="phone-image-container">
-
-                            <img src="{% static 'images/iphone_16__c5bvots96jee_xlarge_2x.png' %}" alt="iPhone 16" class="phone-image">
-
-                        </div>
-
-                        <div class="color-options">
-
-                            <div class="color-option active" style="background-color: #7c98c6;" title="Blue"></div>
-
-                            <div class="color-option" style="background-color: #f5f5f7;" title="White"></div>
-
-                            <div class="color-option" style="background-color: #ffd2e5;" title="Pink"></div>
-
-                            <div class="color-option" style="background-color: #232324;" title="Black"></div>
-
-                        </div>
-
-                        <h3 class="phone-title">iPhone 16</h3>
-
-                        <p class="phone-tagline">A total powerhouse.</p>
-
-                        <p class="phone-price">From £799</p>
-
-                        <p class="phone-price-details">or £33.29/mo. for 24 mo.</p>
-
-                        <div class="action-buttons">
-
-                            <button class="btn-learn-more">Learn more</button>
-
-                            <a href="{% url 'phone_detail' 'iphone16' %}" class="btn-buy-link">Buy <i class="bi bi-chevron-right"></i></a>
-
-                        </div>
-
+                    <div class="action-buttons">
+                        <a href="{% url 'iphone16pro' %}" class="btn-buy-link">Buy <i class="bi bi-chevron-right"></i></a>
                     </div>
-
                 </div>
-
-                
-
-                <!-- iPhone 16e -->
-
-                <div class="col-lg-3 col-md-6">
-
-                    <div class="phone-card">
-
-                        <div class="phone-image-container">
-
-                            <img src="{% static 'images/iphone_16e__cubm3xoy5qaa_xlarge_2x.png' %}" alt="iPhone 16e" class="phone-image">
-
-                        </div>
-
-                        <div class="color-options">
-
-                            <div class="color-option active" style="background-color: #232324;" title="Black"></div>
-
-                        </div>
-
-                        <h3 class="phone-title">iPhone 16e</h3>
-
-                        <p class="phone-tagline">Latest iPhone. Greatest price.</p>
-
-                        <p class="phone-price">From £599</p>
-
-                        <p class="phone-price-details">or £24.95/mo. for 24 mo.</p>
-
-                        <div class="action-buttons">
-
-                            <button class="btn-learn-more">Learn more</button>
-
-                            <a href="{% url 'phone_detail' 'iphone16e' %}" class="btn-buy-link">Buy <i class="bi bi-chevron-right"></i></a>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                
-
-                <!-- iPhone 15 -->
-
-                <div class="col-lg-3 col-md-6">
-
-                    <div class="phone-card">
-
-                        <div class="phone-image-container">
-
-                            <img src="{% static 'images/iphone_15__buwagff0mwwi_xlarge_2x.png' %}" alt="iPhone 15" class="phone-image" style="max-width: 90%;">
-
-                        </div>
-
-                        <div class="color-options">
-
-                            <div class="color-option active" style="background-color: #ffe7b9;" title="Yellow"></div>
-
-                            <div class="color-option" style="background-color: #c1e1c5;" title="Green"></div>
-
-                            <div class="color-option" style="background-color: #b8c4d9;" title="Blue"></div>
-
-                            <div class="color-option" style="background-color: #ffd2e5;" title="Pink"></div>
-
-                            <div class="color-option" style="background-color: #232324;" title="Black"></div>
-
-                        </div>
-
-                        <h3 class="phone-title">iPhone 15</h3>
-
-                        <p class="phone-tagline">As amazing as ever.</p>
-
-                        <p class="phone-price">From £699</p>
-
-                        <p class="phone-price-details">or £29.12/mo. for 24 mo.</p>
-
-                        <div class="action-buttons">
-
-                            <button class="btn-learn-more">Learn more</button>
-
-                            <a href="{% url 'phone_detail' 'iphone15' %}" class="btn-buy-link">Buy <i class="bi bi-chevron-right"></i></a>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
             </div>
-
         </div>
 
-    </section>
-
-
-
-    <!-- 特性区域 -->
-
-    <section class="features-section">
-
-        <div class="container">
-
-            <h2 class="feature-title">Apple Intelligence</h2>
-
-            <p class="feature-description">A new intelligent experience that makes your iPhone understand you better. Through advanced machine learning technology, providing personalized services and recommendations.</p>
-
-            
-
-            <div class="row mt-5">
-
-                <div class="col-md-4 mb-4">
-
-                    <div class="card border-0 h-100">
-
-                        <div class="card-body text-center">
-
-                            <i class="bi bi-cpu" style="font-size: 48px; color: #0071e3;"></i>
-
-                            <h3 class="mt-3">A18 Pro Chip</h3>
-
-                            <p class="text-muted">Industry-leading performance, providing powerful support for AI and gaming</p>
-
-                        </div>
-
+        <!-- iPhone 16 Pro -->
+        <div class="col-md-3">
+            <div class="product-card">
+                <img src="{% static 'images/iphone_16pro__erw9alves2qa_xlarge_2x.png' %}" alt="iPhone 16 Pro" class="product-image">
+                <div class="product-info">
+                    <h3>iPhone 16 Pro</h3>
+                    <p class="tagline">The ultimate iPhone.</p>
+                    <p class="price">From £1099</p>
+                    <p class="monthly">£45.79/mo. for 24 mo.*</p>
+                    <div class="color-options">
+                        <span class="color-dot" style="background-color: #C1B6A5;"></span>
+                        <span class="color-dot" style="background-color: #E3D0B8;"></span>
+                        <span class="color-dot" style="background-color: #F5F5F7;"></span>
+                        <span class="color-dot" style="background-color: #4C4C4C;"></span>
                     </div>
-
-                </div>
-
-                <div class="col-md-4 mb-4">
-
-                    <div class="card border-0 h-100">
-
-                        <div class="card-body text-center">
-
-                            <i class="bi bi-camera" style="font-size: 48px; color: #0071e3;"></i>
-
-                            <h3 class="mt-3">Pro Camera System</h3>
-
-                            <p class="text-muted">48MP main camera, delivering professional-grade photography experience</p>
-
-                        </div>
-
+                    <div class="action-buttons">
+                        <a href="{% url 'iphone16pro' %}" class="btn-buy-link">Buy <i class="bi bi-chevron-right"></i></a>
                     </div>
-
                 </div>
-
-                <div class="col-md-4 mb-4">
-
-                    <div class="card border-0 h-100">
-
-                        <div class="card-body text-center">
-
-                            <i class="bi bi-battery-full" style="font-size: 48px; color: #0071e3;"></i>
-
-                            <h3 class="mt-3">All-day Battery</h3>
-
-                            <p class="text-muted">Larger capacity battery, supporting fast charging technology</p>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
             </div>
-
         </div>
 
-    </section>
-
-
-
-    <!-- 页脚 -->
-
-    <footer class="footer">
-
-        <div class="container">
-
-            <div class="row">
-
-                <div class="col-md-3">
-
-                    <h5>Popular Categories</h5>
-
-                    <ul class="list-unstyled">
-
-                        <li><a href="#" class="text-muted">Phone</a></li>
-
-                        <li><a href="#" class="text-muted">Tablet</a></li>
-
-                        <li><a href="#" class="text-muted">Notebook</a></li>
-
-                        <li><a href="#" class="text-muted">Accessories</a></li>
-
-                    </ul>
-
-                </div>
-
-                <div class="col-md-3">
-
-                    <h5>Customer Support</h5>
-
-                    <ul class="list-unstyled">
-
-                        <li><a href="#" class="text-muted">FAQs</a></li>
-
-                        <li><a href="#" class="text-muted">Payment Methods</a></li>
-
-                        <li><a href="#" class="text-muted">After-sales Service</a></li>
-
-                    </ul>
-
-                </div>
-
-                <div class="col-md-3">
-
-                    <h5>About Us</h5>
-
-                    <ul class="list-unstyled">
-
-                        <li><a href="#" class="text-muted">Company Introduction</a></li>
-
-                        <li><a href="#" class="text-muted">Privacy Policy</a></li>
-
-                        <li><a href="#" class="text-muted">Contact Us</a></li>
-
-                    </ul>
-
-                </div>
-
-                <div class="col-md-3">
-
-                    <h5>Subscribe to Newsletter</h5>
-
-                    <div class="input-group">
-
-                        <input type="email" class="form-control" placeholder="Enter your email address">
-
-                        <button class="btn btn-dark">Subscribe</button>
-
+        <!-- iPhone 16 Plus -->
+        <div class="col-md-3">
+            <div class="product-card">
+                <img src="{% static 'images/iphone_16__c5bvots96jee_xlarge_2x.png' %}" alt="iPhone 16 Plus" class="product-image">
+                <div class="product-info">
+                    <h3>iPhone 16 Plus</h3>
+                    <p class="tagline">A total powerhouse.</p>
+                    <p class="price">From £899</p>
+                    <p class="monthly">£37.45/mo. for 24 mo.*</p>
+                    <div class="color-options">
+                        <span class="color-dot" style="background-color: #4B6CB7;"></span>
+                        <span class="color-dot" style="background-color: #367588;"></span>
+                        <span class="color-dot" style="background-color: #FAB4C1;"></span>
+                        <span class="color-dot" style="background-color: #F5F5F7;"></span>
+                        <span class="color-dot" style="background-color: #1D1D1F;"></span>
                     </div>
-
+                    <div class="action-buttons">
+                        <a href="{% url 'iphone16' %}" class="btn-buy-link">Buy <i class="bi bi-chevron-right"></i></a>
+                    </div>
                 </div>
-
             </div>
-
         </div>
 
-    </footer>
+        <!-- iPhone 16 -->
+        <div class="col-md-3">
+            <div class="product-card">
+                <img src="{% static 'images/iphone_16__c5bvots96jee_xlarge_2x.png' %}" alt="iPhone 16" class="product-image">
+                <div class="product-info">
+                    <h3>iPhone 16</h3>
+                    <p class="tagline">A total powerhouse.</p>
+                    <p class="price">From £799</p>
+                    <p class="monthly">£33.29/mo. for 24 mo.*</p>
+                    <div class="color-options">
+                        <span class="color-dot" style="background-color: #4B6CB7;"></span>
+                        <span class="color-dot" style="background-color: #367588;"></span>
+                        <span class="color-dot" style="background-color: #FAB4C1;"></span>
+                        <span class="color-dot" style="background-color: #F5F5F7;"></span>
+                        <span class="color-dot" style="background-color: #1D1D1F;"></span>
+                    </div>
+                    <div class="action-buttons">
+                        <a href="{% url 'iphone16' %}" class="btn-buy-link">Buy <i class="bi bi-chevron-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-
-        // 全屏功能
-
-        function toggleFullScreen() {
-
-            const video = document.getElementById('phoneVideo');
-
-            
-
-            if (!document.fullscreenElement) {
-
-                if (video.requestFullscreen) {
-
-                    video.requestFullscreen();
-
-                } else if (video.webkitRequestFullscreen) { /* Safari */
-
-                    video.webkitRequestFullscreen();
-
-                } else if (video.msRequestFullscreen) { /* IE11 */
-
-                    video.msRequestFullscreen();
-
-                }
-
-            } else {
-
-                if (document.exitFullscreen) {
-
-                    document.exitFullscreen();
-
-                } else if (document.webkitExitFullscreen) { /* Safari */
-
-                    document.webkitExitFullscreen();
-
-                } else if (document.msExitFullscreen) { /* IE11 */
-
-                    document.msExitFullscreen();
-
-                }
-
-            }
-
-        }
-
+<!-- 特性区域 -->
+<section class="features-section">
+    <div class="container">
+        <h2 class="feature-title">Apple Intelligence</h2>
+        <p class="feature-description">A new intelligent experience that makes your iPhone understand you better. Through advanced machine learning technology, providing personalized services and recommendations.</p>
         
+        <div class="row mt-5">
+            <div class="col-md-4 mb-4">
+                <div class="card border-0 h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-cpu" style="font-size: 48px; color: #0071e3;"></i>
+                        <h3 class="mt-3">A18 Pro Chip</h3>
+                        <p class="text-muted">Industry-leading performance, providing powerful support for AI and gaming</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card border-0 h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-camera" style="font-size: 48px; color: #0071e3;"></i>
+                        <h3 class="mt-3">Pro Camera System</h3>
+                        <p class="text-muted">48MP main camera, delivering professional-grade photography experience</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card border-0 h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-battery-full" style="font-size: 48px; color: #0071e3;"></i>
+                        <h3 class="mt-3">All-day Battery</h3>
+                        <p class="text-muted">Larger capacity battery, supporting fast charging technology</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-        // 颜色选项功能
+<style>
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    color: #1d1d1f;
+    background-color: #fff;
+}
 
-        document.addEventListener('DOMContentLoaded', function() {
+.hero-section {
+    background-color: #fff;
+    color: #1d1d1f;
+    padding: 60px 0;
+    text-align: center;
+    border-bottom: 1px solid #f5f5f7;
+}
 
-            const colorOptions = document.querySelectorAll('.color-option');
+.hero-title {
+    font-size: 56px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
 
-            
+.hero-subtitle {
+    font-size: 28px;
+    font-weight: 400;
+    margin-bottom: 30px;
+    color: #86868b;
+}
 
-            colorOptions.forEach(option => {
+.hero-price {
+    font-size: 24px;
+    margin-bottom: 30px;
+}
 
-                option.addEventListener('click', function() {
+.btn-buy {
+    background-color: #0071e3;
+    color: #fff;
+    border: none;
+    border-radius: 980px;
+    padding: 12px 24px;
+    font-size: 17px;
+    font-weight: 400;
+    transition: all 0.2s;
+}
 
-                    // 移除所有颜色选项的 active 类
+.btn-buy:hover {
+    background-color: #0077ed;
+    color: #fff;
+}
 
-                    const siblings = this.parentElement.querySelectorAll('.color-option');
+.video-container {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+    background-color: #000;
+    aspect-ratio: 16/9;
+}
 
-                    siblings.forEach(sib => sib.classList.remove('active'));
+.video-container video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
 
-                    
+.video-info {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    z-index: 10;
+}
 
-                    // 添加当前颜色选项的 active 类
+.fullscreen-btn {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 10;
+}
 
-                    this.classList.add('active');
+.fullscreen-btn:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+}
 
-                });
+.product-card {
+    text-align: center;
+    padding: 20px;
+    margin-bottom: 30px;
+    transition: transform 0.3s ease;
+}
 
-            });
+.product-card:hover {
+    transform: translateY(-5px);
+}
 
-        });
+.product-image {
+    width: 100%;
+    max-width: 200px;
+    height: auto;
+    margin-bottom: 20px;
+}
 
-    </script>
+.product-info h3 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
 
-</body>
+.tagline {
+    color: #6e6e73;
+    margin-bottom: 10px;
+}
 
-</html> 
+.price {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.monthly {
+    color: #86868b;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.color-options {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.color-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.btn-buy-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px;
+    background-color: #0071e3;
+    color: white;
+    text-decoration: none;
+    border-radius: 20px;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-buy-link:hover {
+    background-color: #0077ed;
+    color: white;
+}
+
+.btn-buy-link i {
+    margin-left: 5px;
+    font-size: 12px;
+}
+
+.features-section {
+    padding: 80px 0;
+    text-align: center;
+}
+
+.feature-title {
+    font-size: 48px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.feature-description {
+    font-size: 24px;
+    color: #86868b;
+    max-width: 800px;
+    margin: 0 auto 40px;
+}
+</style>
+
+<script>
+// 全屏功能
+function toggleFullScreen() {
+    const video = document.getElementById('phoneVideo');
+    
+    if (!document.fullscreenElement) {
+        if (video.requestFullscreen) {
+            video.requestFullscreen();
+        } else if (video.webkitRequestFullscreen) { /* Safari */
+            video.webkitRequestFullscreen();
+        } else if (video.msRequestFullscreen) { /* IE11 */
+            video.msRequestFullscreen();
+        }
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) { /* Safari */
+            document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) { /* IE11 */
+            document.msExitFullscreen();
+        }
+    }
+}
+</script>
+{% endblock %} 

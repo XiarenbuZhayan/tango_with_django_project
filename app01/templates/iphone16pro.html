@@ -1,0 +1,438 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}iPhone 16 Pro - E-trade{% endblock %}
+
+{% block extra_css %}
+<style>
+.product-detail-container {
+    display: flex;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    gap: 40px;
+}
+
+.product-gallery {
+    flex: 1;
+    position: sticky;
+    top: 20px;
+    height: fit-content;
+}
+
+.main-image {
+    width: 100%;
+    aspect-ratio: 1;
+    background: #f5f5f7;
+    border-radius: 18px;
+    overflow: hidden;
+}
+
+.main-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.product-options {
+    flex: 1;
+    max-width: 500px;
+}
+
+.product-options h1 {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.price-display {
+    margin-bottom: 30px;
+}
+
+.current-price {
+    font-size: 24px;
+    font-weight: 600;
+    display: block;
+}
+
+.monthly-price {
+    color: #86868b;
+    font-size: 14px;
+}
+
+.section {
+    margin-bottom: 40px;
+}
+
+.section h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.subtitle {
+    color: #86868b;
+    font-size: 18px;
+    font-weight: normal;
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.option {
+    border: 1px solid #d2d2d7;
+    border-radius: 12px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.option:hover {
+    border-color: #0071e3;
+}
+
+.option.selected {
+    border-color: #0071e3;
+    background-color: #f5f5f7;
+}
+
+.option h3 {
+    font-size: 17px;
+    margin-bottom: 5px;
+}
+
+.display-size {
+    color: #86868b;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.color-options {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.color-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.color-btn:hover {
+    transform: scale(1.1);
+}
+
+.color-btn.selected {
+    border-color: #0071e3;
+}
+
+.selected-color {
+    font-size: 14px;
+    color: #1d1d1f;
+}
+
+.storage-options {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
+
+.storage-option {
+    border: 1px solid #d2d2d7;
+    border-radius: 12px;
+    padding: 15px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.storage-option:hover {
+    border-color: #0071e3;
+}
+
+.storage-option.selected {
+    border-color: #0071e3;
+    background-color: #f5f5f7;
+}
+
+.storage-option.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.storage-size {
+    font-weight: 600;
+}
+
+.storage-price {
+    color: #86868b;
+}
+
+.summary-section {
+    background: #f5f5f7;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 40px;
+}
+
+.summary-content {
+    margin-bottom: 20px;
+}
+
+.summary-content h3 {
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+.summary-content p {
+    margin: 5px 0;
+    color: #86868b;
+}
+
+.add-to-cart-btn {
+    width: 100%;
+    padding: 15px;
+    background: #0071e3;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.add-to-cart-btn:hover {
+    background: #0077ed;
+}
+
+.add-to-cart-btn:disabled {
+    background: #999;
+    cursor: not-allowed;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="product-detail-container">
+    <div class="product-gallery">
+        <div class="main-image">
+            <img id="phone-image" src="{% static phone.image %}" alt="{{ phone.name }}">
+        </div>
+    </div>
+    <div class="product-options">
+        <h1 id="phone-title">{{ phone.name }}</h1>
+        <div class="price-display">
+            <span id="current-price" class="current-price">From £{{ phone.price }}</span>
+            <span id="monthly-price" class="monthly-price">From £{{ phone.monthly_price }}/mo. for 24 mo.*</span>
+        </div>
+
+        <div class="model-selection section">
+            <h2>Model. <span class="subtitle">Which is right for you?</span></h2>
+            <div class="options-grid">
+                {% for model in phone.models %}
+                <div class="option" data-model="{{ model.name }}" data-price="{{ model.price }}" onclick="selectModel(this)">
+                    <h3>{{ model.name }}</h3>
+                    <p class="display-size">{{ model.display_size }}</p>
+                    <p class="price">From £{{ model.price }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="color-selection section">
+            <h2>Color. <span class="subtitle">Pick your favourite.</span></h2>
+            <div class="color-options">
+                {% for color in phone.colors %}
+                <button type="button" class="color-btn" data-color="{{ color.name }}" style="background-color: {{ color.hex_code }};" onclick="selectColor(this)"></button>
+                {% endfor %}
+            </div>
+            <p class="selected-color">Color - <span id="selected-color-text">Select a color</span></p>
+        </div>
+
+        <div class="storage-selection section">
+            <h2>Storage. <span class="subtitle">How much space do you need?</span></h2>
+            <div class="storage-options">
+                {% for storage in phone.storage_options %}
+                <div class="storage-option" data-storage="{{ storage.size }}" data-price="{{ storage.price }}" onclick="selectStorage(this)">
+                    <div class="storage-size">{{ storage.size }}{% if storage.size != '1T' %}GB{% endif %}</div>
+                    <div class="storage-price">£{{ storage.price }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="summary-section">
+            <div class="summary-content">
+                <h3>Your new {{ phone.name }}</h3>
+                <p id="model-summary">Model: Select a model</p>
+                <p id="color-summary">Color: Select a color</p>
+                <p id="storage-summary">Storage: Select storage</p>
+                <p id="total-price">Total: £{{ phone.price }}</p>
+            </div>
+            <button id="add-to-cart" class="add-to-cart-btn" disabled>Add to Cart</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function selectModel(element) {
+    // 移除所有选项的selected类
+    document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+    
+    // 为选中的选项添加selected类
+    element.classList.add('selected');
+    
+    // 获取选中型号的数据
+    const modelName = element.getAttribute('data-model');
+    const modelPrice = element.getAttribute('data-price');
+    
+    // 更新页面标题和价格
+    document.getElementById('phone-title').textContent = modelName;
+    document.getElementById('current-price').textContent = `From £${modelPrice}`;
+    
+    // 计算并更新月付价格
+    const monthlyPrice = (modelPrice / 24).toFixed(2);
+    document.getElementById('monthly-price').textContent = `From £${monthlyPrice}/mo. for 24 mo.*`;
+    
+    // 更新页面标题
+    document.title = `${modelName} - E-trade`;
+    
+    // 更新存储选项价格
+    const storageOptions = document.querySelectorAll('.storage-option');
+    if (modelName === 'iPhone 16 Pro') {
+        // iPhone 16 Pro的存储价格
+        storageOptions[0].setAttribute('data-price', '1099');
+        storageOptions[0].querySelector('.storage-price').textContent = '£1099';
+        
+        storageOptions[1].setAttribute('data-price', '1299');
+        storageOptions[1].querySelector('.storage-price').textContent = '£1299';
+        
+        storageOptions[2].setAttribute('data-price', '1499');
+        storageOptions[2].querySelector('.storage-price').textContent = '£1499';
+    } else if (modelName === 'iPhone 16 Pro Max') {
+        // iPhone 16 Pro Max的存储价格
+        storageOptions[0].setAttribute('data-price', '1199');
+        storageOptions[0].querySelector('.storage-price').textContent = '£1199';
+        
+        storageOptions[1].setAttribute('data-price', '1399');
+        storageOptions[1].querySelector('.storage-price').textContent = '£1399';
+        
+        storageOptions[2].setAttribute('data-price', '1599');
+        storageOptions[2].querySelector('.storage-price').textContent = '£1599';
+    }
+    
+    // 重新选择第一个存储选项
+    storageOptions.forEach(opt => opt.classList.remove('selected'));
+    storageOptions[0].classList.add('selected');
+    
+    // 更新摘要
+    updateSummary();
+}
+
+function selectColor(element) {
+    // 移除所有颜色按钮的selected类
+    document.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('selected'));
+    
+    // 为选中的颜色按钮添加selected类
+    element.classList.add('selected');
+    
+    // 获取选中的颜色名称
+    const colorName = element.getAttribute('data-color');
+    
+    // 更新选中的颜色文本
+    document.getElementById('selected-color-text').textContent = colorName;
+    
+    // 更新手机图片
+    const phoneImage = document.getElementById('phone-image');
+    const currentSrc = phoneImage.src;
+    const baseUrl = currentSrc.substring(0, currentSrc.lastIndexOf('/') + 1);
+    const modelName = document.getElementById('phone-title').textContent.toLowerCase().replace(/ /g, '_');
+    const colorFileName = colorName.toLowerCase().replace(/ /g, '_');
+    const newImagePath = `${baseUrl}${modelName}_${colorFileName}.png`;
+    phoneImage.src = newImagePath;
+    
+    // 更新摘要
+    updateSummary();
+}
+
+function selectStorage(element) {
+    if (element.classList.contains('disabled')) return;
+    
+    // 移除所有存储选项的selected类
+    document.querySelectorAll('.storage-option').forEach(opt => opt.classList.remove('selected'));
+    
+    // 为选中的存储选项添加selected类
+    element.classList.add('selected');
+    
+    // 获取存储大小和价格
+    const storageSize = element.getAttribute('data-storage');
+    const storagePrice = element.getAttribute('data-price');
+    
+    // 更新总价
+    document.getElementById('total-price').textContent = `Total: £${storagePrice}`;
+    
+    // 更新摘要
+    updateSummary();
+}
+
+function updateSummary() {
+    const selectedModel = document.querySelector('.option.selected');
+    const selectedColor = document.querySelector('.color-btn.selected');
+    const selectedStorage = document.querySelector('.storage-option.selected');
+    
+    // 更新摘要信息
+    document.getElementById('model-summary').textContent = `Model: ${selectedModel ? selectedModel.getAttribute('data-model') : 'Select a model'}`;
+    document.getElementById('color-summary').textContent = `Color: ${selectedColor ? selectedColor.getAttribute('data-color') : 'Select a color'}`;
+    
+    // 处理存储显示，特别是1T的情况
+    let storageText = 'Select storage';
+    if (selectedStorage) {
+        const storageSize = selectedStorage.getAttribute('data-storage');
+        storageText = `Storage: ${storageSize}`;
+        if (storageSize !== '1T') {
+            storageText += 'GB';
+        }
+    }
+    document.getElementById('storage-summary').textContent = storageText;
+    
+    // 检查是否可以启用"添加到购物车"按钮
+    const addToCartBtn = document.getElementById('add-to-cart');
+    addToCartBtn.disabled = !(selectedModel && selectedColor && selectedStorage);
+}
+
+// 页面加载时初始化
+document.addEventListener('DOMContentLoaded', function() {
+    // 为默认型号添加selected类
+    const defaultModel = document.querySelector('.option');
+    if (defaultModel) {
+        defaultModel.classList.add('selected');
+        selectModel(defaultModel);
+    }
+    
+    // 为颜色按钮添加点击事件
+    document.querySelectorAll('.color-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            selectColor(this);
+        });
+    });
+    
+    // 为存储选项添加点击事件
+    document.querySelectorAll('.storage-option').forEach(opt => {
+        opt.addEventListener('click', function() {
+            selectStorage(this);
+        });
+    });
+    
+    // 初始化摘要
+    updateSummary();
+});
+</script>
+{% endblock %} 

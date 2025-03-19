@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpResponseNotFound
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.models import User
@@ -114,110 +114,14 @@ def bag(request):
     return render(request, 'bag.html')
 
 def phone_detail(request, phone_id):
-    """
-    View function for displaying phone detail page with configuration options
-    """
-    # Phone data dictionary - in a real app this would come from a database
-    phones = {
-        'iphone16pro': {
-            'id': 'iphone16pro',
-            'name': 'iPhone 16 Pro',
-            'base_price': 999,
-            'monthly_price': 41.62,
-            'display_size': '6.3',
-            'has_max_model': True,
-            'max_price': 1199,
-            'max_monthly_price': 49.95,
-            'max_display_size': '6.9',
-            'image_path': 'images/iphone_16pro__erw9alves2qa_xlarge_2x.png',
-            'colors': [
-                {'name': 'Natural Titanium', 'hex_code': '#e3ccb4', 'image_path': 'images/iphone_16pro__erw9alves2qa_xlarge_2x.png'},
-                {'name': 'White Titanium', 'hex_code': '#f0e8d6', 'image_path': 'images/iphone_16pro__erw9alves2qa_xlarge_2x.png'},
-                {'name': 'Silver Titanium', 'hex_code': '#f5f5f7', 'image_path': 'images/iphone_16pro__erw9alves2qa_xlarge_2x.png'},
-                {'name': 'Black Titanium', 'hex_code': '#232324', 'image_path': 'images/iphone_16pro__erw9alves2qa_xlarge_2x.png'}
-            ],
-            'storage_options': [
-                {'size': 128, 'price_add': 0, 'description': 'Good for most users with light storage needs'},
-                {'size': 256, 'price_add': 100, 'description': 'Better for users who take lots of photos and videos'},
-                {'size': 512, 'price_add': 300, 'description': 'Best for power users with large media libraries'},
-                {'size': 1024, 'price_add': 500, 'description': 'Ideal for professionals working with large files'}
-            ]
-        },
-        'iphone16': {
-            'id': 'iphone16',
-            'name': 'iPhone 16',
-            'base_price': 799,
-            'monthly_price': 33.29,
-            'display_size': '6.1',
-            'has_max_model': True,
-            'max_price': 899,
-            'max_monthly_price': 37.45,
-            'max_display_size': '6.7',
-            'image_path': 'images/iphone_16__c5bvots96jee_xlarge_2x.png',
-            'colors': [
-                {'name': 'Blue', 'hex_code': '#7c98c6', 'image_path': 'images/iphone_16__c5bvots96jee_xlarge_2x.png'},
-                {'name': 'White', 'hex_code': '#f5f5f7', 'image_path': 'images/iphone_16__c5bvots96jee_xlarge_2x.png'},
-                {'name': 'Pink', 'hex_code': '#ffd2e5', 'image_path': 'images/iphone_16__c5bvots96jee_xlarge_2x.png'},
-                {'name': 'Black', 'hex_code': '#232324', 'image_path': 'images/iphone_16__c5bvots96jee_xlarge_2x.png'}
-            ],
-            'storage_options': [
-                {'size': 128, 'price_add': 0, 'description': 'Good for most users with light storage needs'},
-                {'size': 256, 'price_add': 100, 'description': 'Better for users who take lots of photos and videos'},
-                {'size': 512, 'price_add': 300, 'description': 'Best for power users with large media libraries'}
-            ]
-        },
-        'iphone16e': {
-            'id': 'iphone16e',
-            'name': 'iPhone 16e',
-            'base_price': 599,
-            'monthly_price': 24.95,
-            'display_size': '6.1',
-            'has_max_model': False,
-            'image_path': 'images/iphone_16e__cubm3xoy5qaa_xlarge_2x.png',
-            'colors': [
-                {'name': 'Black', 'hex_code': '#232324', 'image_path': 'images/iphone_16e__cubm3xoy5qaa_xlarge_2x.png'}
-            ],
-            'storage_options': [
-                {'size': 128, 'price_add': 0, 'description': 'Good for most users with light storage needs'},
-                {'size': 256, 'price_add': 100, 'description': 'Better for users who take lots of photos and videos'}
-            ]
-        },
-        'iphone15': {
-            'id': 'iphone15',
-            'name': 'iPhone 15',
-            'base_price': 699,
-            'monthly_price': 29.12,
-            'display_size': '6.1',
-            'has_max_model': True,
-            'max_price': 799,
-            'max_monthly_price': 33.29,
-            'max_display_size': '6.7',
-            'image_path': 'images/iphone_15__buwagff0mwwi_xlarge_2x.png',
-            'colors': [
-                {'name': 'Yellow', 'hex_code': '#ffe7b9', 'image_path': 'images/iphone_15__buwagff0mwwi_xlarge_2x.png'},
-                {'name': 'Green', 'hex_code': '#c1e1c5', 'image_path': 'images/iphone_15__buwagff0mwwi_xlarge_2x.png'},
-                {'name': 'Blue', 'hex_code': '#b8c4d9', 'image_path': 'images/iphone_15__buwagff0mwwi_xlarge_2x.png'},
-                {'name': 'Pink', 'hex_code': '#ffd2e5', 'image_path': 'images/iphone_15__buwagff0mwwi_xlarge_2x.png'},
-                {'name': 'Black', 'hex_code': '#232324', 'image_path': 'images/iphone_15__buwagff0mwwi_xlarge_2x.png'}
-            ],
-            'storage_options': [
-                {'size': 128, 'price_add': 0, 'description': 'Good for most users with light storage needs'},
-                {'size': 256, 'price_add': 100, 'description': 'Better for users who take lots of photos and videos'},
-                {'size': 512, 'price_add': 300, 'description': 'Best for power users with large media libraries'}
-            ]
-        }
-    }
+    # 添加重定向逻辑
+    if phone_id == 31:
+        return redirect('iphone16pro')
+    elif phone_id == 1:
+        return redirect('iphone16')
     
-    # Get the phone data or return 404 if not found
-    phone = phones.get(phone_id)
-    if not phone:
-        return HttpResponseNotFound("Phone not found")
-    
-    context = {
-        'phone': phone
-    }
-    
-    return render(request, 'phone_detail.html', context)
+    # 对于其他所有phone_id，直接返回404
+    return HttpResponseNotFound("Phone not found")
 
 def tablet(request):
     """
@@ -242,3 +146,221 @@ def accessory(request):
     View function for displaying accessory page
     """
     return render(request, 'accessory.html')
+
+def iphone16(request):
+    """
+    View function for displaying iPhone 16 detail page
+    """
+    # iPhone 16数据
+    phone = {
+        'name': 'iPhone 16',
+        'models': [
+            {
+                'name': 'iPhone 16',
+                'display_size': '6.1-inch display',
+                'price': 799,
+                'storage_options': [
+                    {'size': 128, 'price': 799},
+                    {'size': 256, 'price': 899},
+                    {'size': 512, 'price': 1099}
+                ]
+            },
+            {
+                'name': 'iPhone 16 Plus',
+                'display_size': '6.7-inch display',
+                'price': 899,
+                'storage_options': [
+                    {'size': 128, 'price': 899},
+                    {'size': 256, 'price': 999},
+                    {'size': 512, 'price': 1199}
+                ]
+            }
+        ],
+        'colors': [
+            {'name': 'Ultramarine', 'hex_code': '#4B6CB7'},
+            {'name': 'Teal', 'hex_code': '#367588'},
+            {'name': 'Pink', 'hex_code': '#FAB4C1'},
+            {'name': 'White', 'hex_code': '#F5F5F7'},
+            {'name': 'Black', 'hex_code': '#1D1D1F'}
+        ],
+        'storage_options': [
+            {'size': 128, 'price': 799},
+            {'size': 256, 'price': 899},
+            {'size': 512, 'price': 1099}
+        ],
+        'price': 799,
+        'monthly_price': 33.29,
+        'image': 'images/iphone_16__c5bvots96jee_xlarge_2x.png'
+    }
+    
+    return render(request, 'iphone16.html', {'phone': phone})
+
+def iphone16pro(request):
+    """
+    View function for displaying iPhone 16 Pro detail page
+    """
+    # 直接使用phone_id=31的数据
+    phones = {
+        31: {  # iPhone 16 Pro
+            'name': 'iPhone 16 Pro',
+            'models': [
+                {
+                    'name': 'iPhone 16 Pro',
+                    'display_size': '6.1-inch display',
+                    'price': 1099,
+                    'storage_options': [
+                        {'size': 256, 'price': 1099},
+                        {'size': 512, 'price': 1299},
+                        {'size': '1T', 'price': 1499}
+                    ]
+                },
+                {
+                    'name': 'iPhone 16 Pro Max',
+                    'display_size': '6.7-inch display',
+                    'price': 1199,
+                    'storage_options': [
+                        {'size': 256, 'price': 1199},
+                        {'size': 512, 'price': 1399},
+                        {'size': '1T', 'price': 1599}
+                    ]
+                }
+            ],
+            'colors': [
+                {'name': 'Desert Titanium', 'hex_code': '#C1B6A5'},
+                {'name': 'Natural Titanium', 'hex_code': '#E3D0B8'},
+                {'name': 'White Titanium', 'hex_code': '#F5F5F7'},
+                {'name': 'Black Titanium', 'hex_code': '#4C4C4C'}
+            ],
+            'storage_options': [
+                {'size': 256, 'price': 1099},
+                {'size': 512, 'price': 1299},
+                {'size': '1T', 'price': 1499}
+            ],
+            'price': 1099,
+            'monthly_price': 45.79,
+            'image': 'images/iphone_16pro__erw9alves2qa_xlarge_2x.png'
+        }
+    }
+    
+    phone = phones[31]
+    return render(request, 'iphone16pro.html', {'phone': phone})
+
+def ipadpro(request):
+    tablet_data = {
+        'name': 'iPad Pro',
+        'price': 999,
+        'monthly_price': 41.62,
+        'display_size': '11-inch',
+        'image': 'images/ipad_pro_silver.png',
+        'models': [
+            {'id': 1, 'name': 'iPad Pro 11-inch', 'price': 999, 'base_price': 999, 'display_size': '11-inch'},
+            {'id': 2, 'name': 'iPad Pro 13-inch', 'price': 1299, 'base_price': 1299, 'display_size': '13-inch'}
+        ],
+        'colors': [
+            {'name': 'Silver', 'hex_code': '#E3E3E3'},
+            {'name': 'Space Black', 'hex_code': '#535150'}
+        ],
+        'storage_options': [
+            {'size': 128, 'price': 999},
+            {'size': 256, 'price': 1199},
+            {'size': 512, 'price': 1399},
+            {'size': 1024, 'price': 1799}
+        ]
+    }
+    
+    # 为13英寸型号准备不同的存储价格
+    if 'model' in request.GET and request.GET.get('model') == '13-inch':
+        tablet_data['name'] = 'iPad Pro 13-inch'
+        tablet_data['price'] = 1299
+        tablet_data['monthly_price'] = 54.12
+        tablet_data['storage_options'] = [
+            {'size': 128, 'price': 1299},
+            {'size': 256, 'price': 1499},
+            {'size': 512, 'price': 1699},
+            {'size': 1024, 'price': 2099}
+        ]
+    
+    return render(request, 'ipadpro.html', {'tablet': tablet_data})
+
+def ipadair(request):
+    tablet_data = {
+        'name': 'iPad Air',
+        'price': 599,
+        'monthly_price': 24.96,
+        'display_size': '11-inch',
+        'image': 'images/ipad_air_blue.png',
+        'models': [
+            {'id': 1, 'name': 'iPad Air 11-inch', 'price': 599, 'base_price': 599, 'display_size': '11-inch'},
+            {'id': 2, 'name': 'iPad Air 13-inch', 'price': 799, 'base_price': 799, 'display_size': '13-inch'}
+        ],
+        'colors': [
+            {'name': 'Space Gray', 'hex_code': '#535150'},
+            {'name': 'Blue', 'hex_code': '#557FA3'},
+            {'name': 'Purple', 'hex_code': '#9A6EB5'},
+            {'name': 'Starlight', 'hex_code': '#F0E4D3'}
+        ],
+        'storage_options': [
+            {'size': 64, 'price': 599},
+            {'size': 256, 'price': 699},
+            {'size': 512, 'price': 899},
+            {'size': 1024, 'price': 1099}
+        ]
+    }
+    
+    # 为13英寸型号准备不同的存储价格
+    if 'model' in request.GET and request.GET.get('model') == '13-inch':
+        tablet_data['name'] = 'iPad Air 13-inch'
+        tablet_data['price'] = 799
+        tablet_data['monthly_price'] = 33.29
+        tablet_data['storage_options'] = [
+            {'size': 64, 'price': 799},
+            {'size': 256, 'price': 899},
+            {'size': 512, 'price': 1099},
+            {'size': 1024, 'price': 1299}
+        ]
+    
+    return render(request, 'ipadair.html', {'tablet': tablet_data})
+
+def ipad(request):
+    tablet_data = {
+        'name': 'iPad',
+        'price': 329,
+        'monthly_price': 13.71,
+        'display_size': '10.9-inch',
+        'image': 'images/ipad_blue.png',
+        'colors': [
+            {'name': 'Silver', 'hex_code': '#E3E3E3'},
+            {'name': 'Blue', 'hex_code': '#557FA3'},
+            {'name': 'Pink', 'hex_code': '#DE7C80'},
+            {'name': 'Yellow', 'hex_code': '#FDDE55'}
+        ],
+        'storage_options': [
+            {'size': 128, 'price': 329},
+            {'size': 256, 'price': 429},
+            {'size': 512, 'price': 629}
+        ]
+    }
+    
+    return render(request, 'ipad.html', {'tablet': tablet_data})
+
+def ipadmini(request):
+    tablet_data = {
+        'name': 'iPad mini',
+        'price': 499,
+        'monthly_price': 20.79,
+        'display_size': '8.3-inch',
+        'image': 'images/ipad_mini_starlight.png',
+        'colors': [
+            {'name': 'Space Grey', 'hex_code': '#535150'},
+            {'name': 'Blue', 'hex_code': '#557FA3'},
+            {'name': 'Purple', 'hex_code': '#9A6EB5'},
+            {'name': 'Starlight', 'hex_code': '#F0E4D3'}
+        ],
+        'storage_options': [
+            {'size': 128, 'price': 499},
+            {'size': 256, 'price': 599},
+            {'size': 512, 'price': 799}
+        ]
+    }
+    
+    return render(request, 'ipadmini.html', {'tablet': tablet_data})

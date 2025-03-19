@@ -246,6 +246,14 @@
 
             padding: 0 15px;
 
+            transition: transform 0.3s ease;
+
+        }
+
+        .tablet-card:hover {
+
+            transform: translateY(-5px);
+
         }
 
         .tablet-image-container {
@@ -296,15 +304,17 @@
 
             justify-content: center;
 
+            gap: 8px;
+
             margin-bottom: 20px;
 
         }
 
         .color-option {
 
-            width: 20px;
+            width: 12px;
 
-            height: 20px;
+            height: 12px;
 
             border-radius: 50%;
 
@@ -312,7 +322,7 @@
 
             cursor: pointer;
 
-            border: 1px solid #e0e0e0;
+            border: 1px solid rgba(0, 0, 0, 0.1);
 
         }
 
@@ -326,17 +336,13 @@
 
             font-size: 24px;
 
-            font-weight: 600;
-
-            margin-bottom: 5px;
+            margin-bottom: 10px;
 
         }
 
         .tablet-tagline {
 
-            font-size: 16px;
-
-            color: #86868b;
+            color: #6e6e73;
 
             margin-bottom: 10px;
 
@@ -344,17 +350,19 @@
 
         .tablet-price {
 
-            font-size: 16px;
+            font-size: 17px;
 
-            margin-bottom: 15px;
+            font-weight: 600;
+
+            margin-bottom: 5px;
 
         }
 
         .tablet-price-details {
 
-            font-size: 14px;
-
             color: #86868b;
+
+            font-size: 14px;
 
             margin-bottom: 20px;
 
@@ -366,43 +374,43 @@
 
             justify-content: center;
 
-            gap: 10px;
-
-        }
-
-        .btn-learn-more {
-
-            background: linear-gradient(to right, #0071e3, #42a5f5);
-
-            color: white;
-
-            border: none;
-
-            border-radius: 20px;
-
-            padding: 8px 20px;
-
-            font-size: 14px;
-
         }
 
         .btn-buy-link {
 
-            color: #0071e3;
+            display: inline-flex;
+
+            align-items: center;
+
+            padding: 8px 16px;
+
+            background-color: #0071e3;
+
+            color: white;
 
             text-decoration: none;
 
+            border-radius: 20px;
+
             font-size: 14px;
 
-            display: flex;
-
-            align-items: center;
+            transition: background-color 0.3s ease;
 
         }
 
         .btn-buy-link:hover {
 
-            text-decoration: underline;
+            background-color: #0077ed;
+
+            color: white;
+
+        }
+
+        .btn-buy-link i {
+
+            margin-left: 5px;
+
+            font-size: 12px;
 
         }
 
@@ -440,9 +448,9 @@
 
             <p class="hero-subtitle">Supercharged by M4</p>
 
-            <p class="hero-price">From £99</p>
+            <p class="hero-price">From £999</p>
 
-            <button class="btn btn-buy">Buy Now</button>
+            <a href="{% url 'ipadpro' %}" class="btn btn-buy">Buy Now</a>
 
         </div>
 
@@ -492,9 +500,9 @@
 
                         <div class="color-options">
 
-                            <div class="color-option active" style="background-color: #e3ccb4;" title="Space Gray"></div>
+                            <div class="color-option active" style="background-color: #535150;" title="Space Gray"></div>
 
-                            <div class="color-option" style="background-color: #f0e8d6;" title="Silver"></div>
+                            <div class="color-option" style="background-color: #E3E3E3;" title="Silver"></div>
 
                         </div>
 
@@ -504,15 +512,13 @@
 
                         <p class="tablet-tagline">Ultimate iPad experience.</p>
 
-                        <p class="tablet-price">From £99</p>
+                        <p class="tablet-price">From £999</p>
 
-                        <p class="tablet-price-details">or £1.62/mo. for 24 mo.</p>
+                        <p class="tablet-price-details">£41.62/mo. for 24 mo.*</p>
 
                         <div class="action-buttons">
 
-                            <button class="btn-learn-more">Learn more</button>
-
-                            <a href="#" class="btn-buy-link">Buy <i class="bi bi-chevron-right"></i></a>
+                            <a href="{% url 'ipadpro' %}" class="btn-buy-link">Buy <i class="bi bi-chevron-right"></i></a>
 
                         </div>
 
@@ -536,13 +542,13 @@
 
                         <div class="color-options">
 
-                            <div class="color-option active" style="background-color: #7c98c6;" title="Blue"></div>
+                            <div class="color-option active" style="background-color: #535150;" title="Space Gray"></div>
 
-                            <div class="color-option" style="background-color: #f5f5f7;" title="Starlight"></div>
+                            <div class="color-option" style="background-color: #557FA3;" title="Blue"></div>
 
-                            <div class="color-option" style="background-color: #ffd2e5;" title="Pink"></div>
+                            <div class="color-option" style="background-color: #9A6EB5;" title="Purple"></div>
 
-                            <div class="color-option" style="background-color: #232324;" title="Space Gray"></div>
+                            <div class="color-option" style="background-color: #F0E4D3;" title="Starlight"></div>
 
                         </div>
 
@@ -550,15 +556,13 @@
 
                         <p class="tablet-tagline">Serious performance.</p>
 
-                        <p class="tablet-price">From £99</p>
+                        <p class="tablet-price">From £599</p>
 
-                        <p class="tablet-price-details">or £4.95/mo. for 24 mo.</p>
+                        <p class="tablet-price-details">£24.96/mo. for 24 mo.*</p>
 
                         <div class="action-buttons">
 
-                            <button class="btn-learn-more">Learn more</button>
-
-                            <a href="#" class="btn-buy-link">Buy <i class="bi bi-chevron-right"></i></a>
+                            <a href="{% url 'ipadair' %}" class="btn-buy-link">Buy <i class="bi bi-chevron-right"></i></a>
 
                         </div>
 
@@ -582,13 +586,13 @@
 
                         <div class="color-options">
 
-                            <div class="color-option active" style="background-color: #7c98c6;" title="Blue"></div>
+                            <div class="color-option active" style="background-color: #E3E3E3;" title="Silver"></div>
 
-                            <div class="color-option" style="background-color: #f5f5f7;" title="Silver"></div>
+                            <div class="color-option" style="background-color: #557FA3;" title="Blue"></div>
 
-                            <div class="color-option" style="background-color: #ffd2e5;" title="Pink"></div>
+                            <div class="color-option" style="background-color: #DE7C80;" title="Pink"></div>
 
-                            <div class="color-option" style="background-color: #ffe7b9;" title="Yellow"></div>
+                            <div class="color-option" style="background-color: #FDDE55;" title="Yellow"></div>
 
                         </div>
 
@@ -596,15 +600,13 @@
 
                         <p class="tablet-tagline">Colorfully capable.</p>
 
-                        <p class="tablet-price">From £49</p>
+                        <p class="tablet-price">From £329</p>
 
-                        <p class="tablet-price-details">or £8.70/mo. for 24 mo.</p>
+                        <p class="tablet-price-details">£13.71/mo. for 24 mo.*</p>
 
                         <div class="action-buttons">
 
-                            <button class="btn-learn-more">Learn more</button>
-
-                            <a href="#" class="btn-buy-link">Buy <i class="bi bi-chevron-right"></i></a>
+                            <a href="{% url 'ipad' %}" class="btn-buy-link">Buy <i class="bi bi-chevron-right"></i></a>
 
                         </div>
 
@@ -628,13 +630,13 @@
 
                         <div class="color-options">
 
-                            <div class="color-option active" style="background-color: #b8c4d9;" title="Purple"></div>
+                            <div class="color-option active" style="background-color: #535150;" title="Space Gray"></div>
 
-                            <div class="color-option" style="background-color: #f5f5f7;" title="Starlight"></div>
+                            <div class="color-option" style="background-color: #557FA3;" title="Blue"></div>
 
-                            <div class="color-option" style="background-color: #ffd2e5;" title="Pink"></div>
+                            <div class="color-option" style="background-color: #9A6EB5;" title="Purple"></div>
 
-                            <div class="color-option" style="background-color: #232324;" title="Space Gray"></div>
+                            <div class="color-option" style="background-color: #F0E4D3;" title="Starlight"></div>
 
                         </div>
 
@@ -642,15 +644,13 @@
 
                         <p class="tablet-tagline">Mega power. Mini sized.</p>
 
-                        <p class="tablet-price">From £99</p>
+                        <p class="tablet-price">From £399</p>
 
-                        <p class="tablet-price-details">or £0.79/mo. for 24 mo.</p>
+                        <p class="tablet-price-details">£16.62/mo. for 24 mo.*</p>
 
                         <div class="action-buttons">
 
-                            <button class="btn-learn-more">Learn more</button>
-
-                            <a href="#" class="btn-buy-link">Buy <i class="bi bi-chevron-right"></i></a>
+                            <a href="{% url 'ipadmini' %}" class="btn-buy-link">Buy <i class="bi bi-chevron-right"></i></a>
 
                         </div>
 
