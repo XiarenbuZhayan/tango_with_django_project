@@ -3,8 +3,17 @@ from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.models import User
 from django.contrib import messages
+from django.templatetags.static import static
+from .models import UserPaymentInfo, Order, OrderItem, OrderFeedback, ChatMessage
 import re
 import json
+from datetime import datetime
+from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
+from django.utils import timezone
+
+# 新增: 导入创建反馈模型所需的依赖
+from django.views.decorators.csrf import csrf_exempt
 
 # 添加密码验证函数
 def is_valid_password(password):
@@ -106,9 +115,229 @@ def personal_info(request):
     return render(request, 'personal_info.html')
 
 def my_orders(request):
-    if not request.user.is_authenticated:
-        return redirect('signin')
-    return render(request, 'my_orders.html')
+    if request.method == 'POST':
+        try:
+            # 从POST请求中获取订单数据
+            data = json.loads(request.body)
+            
+            # 获取购物车数据
+            cart_items = request.session.get('cart_items', [])
+            
+            # 如果购物车为空，返回错误
+            if not cart_items:
+                return JsonResponse({'status': 'error', 'message': 'Your shopping cart is empty'})
+            
+            # 从session中获取payment_info
+            payment_info_session = request.session.get('payment_info', {})
+            
+            # 保存用户支付信息到数据库
+            if payment_info_session:
+                try:
+                    if request.user.is_authenticated:
+                        # 如果用户已登录，更新或创建与用户关联的支付信息
+                        payment_info, created = UserPaymentInfo.objects.update_or_create(
+                            user=request.user,
+                            defaults={
+                                'title': payment_info_session.get('title', ''),
+                                'firstName': payment_info_session.get('firstName', ''),
+                                'surname': payment_info_session.get('surname', ''),
+                                'addressLine1': payment_info_session.get('addressLine1', ''),
+                                'addressLine2': payment_info_session.get('addressLine2', ''),
+                                'townCity': payment_info_session.get('townCity', ''),
+                                'county': payment_info_session.get('county', ''),
+                                'postcode': payment_info_session.get('postcode', ''),
+                                'email': payment_info_session.get('email', ''),
+                                'phone': payment_info_session.get('phone', ''),
+                                'cardNumberLast4': payment_info_session.get('cardNumberLast4', ''),
+                                'expiryDate': payment_info_session.get('expiryDate', '')
+                            }
+                        )
+                    else:
+                        # 对于未登录用户，使用session_key
+                        session_key = request.session.session_key
+                        if not session_key:
+                            request.session.create()
+                            session_key = request.session.session_key
+                        
+                        payment_info, created = UserPaymentInfo.objects.update_or_create(
+                            session_key=session_key,
+                            defaults={
+                                'title': payment_info_session.get('title', ''),
+                                'firstName': payment_info_session.get('firstName', ''),
+                                'surname': payment_info_session.get('surname', ''),
+                                'addressLine1': payment_info_session.get('addressLine1', ''),
+                                'addressLine2': payment_info_session.get('addressLine2', ''),
+                                'townCity': payment_info_session.get('townCity', ''),
+                                'county': payment_info_session.get('county', ''),
+                                'postcode': payment_info_session.get('postcode', ''),
+                                'email': payment_info_session.get('email', ''),
+                                'phone': payment_info_session.get('phone', ''),
+                                'cardNumberLast4': payment_info_session.get('cardNumberLast4', ''),
+                                'expiryDate': payment_info_session.get('expiryDate', '')
+                            }
+                        )
+                except Exception as e:
+                    print(f"Error saving payment info to database: {e}")
+            
+            # 生成唯一的订单号 - 使用格式：年月日+随机数字
+            import random
+            order_number = f"ORD-{datetime.now().strftime('%Y%m%d')}-{random.randint(1000, 9999)}"
+            
+            # 创建订单记录
+            order = Order.objects.create(
+                user=request.user if request.user.is_authenticated else None,
+                session_key=request.session.session_key if not request.user.is_authenticated else None,
+                shipping_name=data['shipping_address']['name'],
+                shipping_address=f"{data['shipping_address']['address1']}, {data['shipping_address']['address2']}, {data['shipping_address']['city_postcode']}",
+                shipping_phone=data['shipping_address']['phone'],
+                shipping_email=data['shipping_address']['email'],
+                # 确保payment_method不会太长，最多只保留95个字符
+                payment_method=data['payment_method'][:95] if data['payment_method'] else 'Card payment',
+                total_amount=data['total_amount'],
+                status='Pending'
+            )
+            
+            # 订单项总数量
+            total_items = 0
+            
+            # 添加订单项
+            for item in cart_items:
+                OrderItem.objects.create(
+                    order=order,
+                    product_name=item['name'],
+                    product_price=item['price'],
+                    quantity=item['quantity'],
+                    product_image=item['image']
+                )
+                total_items += item['quantity']
+            
+            # 清空购物车
+            request.session['cart_items'] = []
+            request.session.modified = True
+            
+            # 将订单信息存储在session中，以便success页面使用
+            request.session['last_order_id'] = order.id
+            request.session['last_order_number'] = order_number  # 添加订单号
+            request.session['last_order_date'] = order.created_at.strftime('%Y-%m-%d %H:%M:%S')
+            request.session['last_order_total'] = str(order.total_amount)
+            request.session['last_order_items'] = total_items  # 添加商品总数
+            
+            return JsonResponse({
+                'status': 'success', 
+                'message': 'Order placed successfully', 
+                'order_id': order.id,
+                'order_number': order_number
+            })
+        
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid JSON data'})
+        except KeyError as e:
+            return JsonResponse({'status': 'error', 'message': f'Missing required field: {str(e)}'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
+    
+    # 处理GET请求 - 处理可能的订单操作，如取消订单
+    if request.method == 'GET' and 'action' in request.GET and 'order_id' in request.GET:
+        action = request.GET.get('action')
+        order_id = request.GET.get('order_id')
+        
+        try:
+            # 验证订单属于当前用户
+            if request.user.is_authenticated:
+                order = Order.objects.get(id=order_id, user=request.user)
+            else:
+                session_key = request.session.session_key
+                order = Order.objects.get(id=order_id, session_key=session_key)
+            
+            if action == 'cancel':
+                # 只有"Pending"和"Processing"状态的订单可以取消
+                if order.status in ['Pending', 'Processing']:
+                    order.status = 'Cancelled'
+                    order.save()
+                    messages.success(request, f'Order #{order.id} has been cancelled.')
+                else:
+                    messages.error(request, f'Cannot cancel order #{order.id} because it is already {order.status}.')
+            
+            # 可以添加其他可能的操作，如重新下单等
+            
+        except Order.DoesNotExist:
+            messages.error(request, 'Order not found or you do not have permission to access it.')
+    
+    # 获取用户的订单
+    if request.user.is_authenticated:
+        orders = Order.objects.filter(user=request.user).order_by('-created_at')
+    else:
+        session_key = request.session.session_key
+        if not session_key:
+            orders = []
+        else:
+            orders = Order.objects.filter(session_key=session_key).order_by('-created_at')
+    
+    # 为每个订单加载订单项和计算更多信息
+    orders_with_items = []
+    for order in orders:
+        order_items = OrderItem.objects.filter(order=order)
+        
+        # 计算订单中的商品总数
+        total_items = sum(item.quantity for item in order_items)
+        
+        # 获取订单状态的显示类
+        status_class = get_status_class(order.status)
+        
+        # 确定可用的操作
+        available_actions = []
+        if order.status in ['Pending', 'Processing']:
+            available_actions.append('cancel')
+        
+        orders_with_items.append({
+            'order': order,
+            'items': order_items,
+            'total_items': total_items,
+            'status_class': status_class,
+            'available_actions': available_actions,
+            'created_date': order.created_at.strftime('%Y-%m-%d'),
+            'created_time': order.created_at.strftime('%H:%M:%S')
+        })
+    
+    context = {
+        'orders': orders_with_items,
+        'orders_count': len(orders_with_items)
+    }
+    
+    return render(request, 'my_orders.html', context)
+
+# 帮助函数，获取订单状态的显示类
+def get_status_class(status):
+    status_classes = {
+        'Pending': 'status-pending',
+        'Processing': 'status-processing',
+        'Shipped': 'status-shipped',
+        'Delivered': 'status-delivered',
+        'Cancelled': 'status-cancelled'
+    }
+    return status_classes.get(status, 'status-pending')
+
+def success(request):
+    """订单成功页面"""
+    context = {}
+    
+    # 从session中获取最后一个订单的信息
+    order_id = request.session.get('last_order_id')
+    if order_id:
+        context['order_id'] = order_id
+        context['order_number'] = request.session.get('last_order_number')
+        context['order_date'] = request.session.get('last_order_date')
+        context['total_amount'] = request.session.get('last_order_total')
+        context['order_items'] = request.session.get('last_order_items')
+        
+        # 清除session中的订单信息，避免刷新页面时重复显示
+        # 但保留ID以便用户可以再次查看
+        request.session.pop('last_order_number', None)
+        request.session.pop('last_order_date', None)
+        request.session.pop('last_order_total', None)
+        request.session.pop('last_order_items', None)
+    
+    return render(request, 'success.html', context)
 
 def bag(request):
     # 从session中获取购物车数据
@@ -677,3 +906,492 @@ def macbookair15(request):
         ],
     }
     return render(request, 'macbookair15.html', {'laptop': laptop_data})
+
+def payment_check(request):
+    # 从session中获取购物车数据
+    cart_items = request.session.get('cart_items', [])
+    total_price = sum(float(item.get('price', 0)) * int(item.get('quantity', 1)) for item in cart_items)
+    
+    # 尝试获取用户的默认支付信息
+    payment_info = None
+    try:
+        if request.user.is_authenticated:
+            # 如果用户已登录，尝试获取与用户关联的支付信息
+            payment_info = UserPaymentInfo.objects.filter(user=request.user).first()
+        else:
+            # 对于未登录用户，使用session_key作为标识
+            session_key = request.session.session_key
+            if not session_key:
+                request.session.create()
+                session_key = request.session.session_key
+            payment_info = UserPaymentInfo.objects.filter(session_key=session_key).first()
+    except Exception as e:
+        print(f"Error retrieving payment info: {e}")
+    
+    # 处理POST请求 - 保存支付信息到session，但不保存到数据库
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            
+            # 处理卡号 - 移除所有空格并获取最后4位
+            card_number = data.get('cardNumber', '')
+            if card_number:
+                # 使用正则表达式替换所有空格
+                card_number = re.sub(r'\s+', '', card_number)
+                card_last_4 = card_number[-4:] if len(card_number) >= 4 else card_number
+            else:
+                card_last_4 = ''
+            
+            # 仅将支付信息存储在session中，以便checkout页面使用
+            # 不再保存到数据库，而是在下单时再保存
+            payment_info_dict = {
+                'title': data.get('title', ''),
+                'firstName': data.get('firstName', ''),
+                'surname': data.get('surname', ''),
+                'addressLine1': data.get('addressLine1', ''),
+                'addressLine2': data.get('addressLine2', ''),
+                'townCity': data.get('townCity', ''),
+                'county': data.get('county', ''),
+                'postcode': data.get('postcode', ''),
+                'email': data.get('email', ''),
+                'phone': data.get('phone', ''),
+                'cardNumberLast4': card_last_4,
+                'expiryDate': data.get('expiryDate', '')
+            }
+            
+            # 将支付信息存储在session中
+            request.session['payment_info'] = payment_info_dict
+            
+            # 注释掉原数据库保存代码
+            """
+            # 为用户或会话保存/更新支付信息
+            if request.user.is_authenticated:
+                payment_info, created = UserPaymentInfo.objects.update_or_create(
+                    user=request.user,
+                    defaults={
+                        'title': data.get('title', ''),
+                        'firstName': data.get('firstName', ''),
+                        'surname': data.get('surname', ''),
+                        'addressLine1': data.get('addressLine1', ''),
+                        'addressLine2': data.get('addressLine2', ''),
+                        'townCity': data.get('townCity', ''),
+                        'county': data.get('county', ''),
+                        'postcode': data.get('postcode', ''),
+                        'email': data.get('email', ''),
+                        'phone': data.get('phone', ''),
+                        'cardNumberLast4': card_last_4,
+                        'expiryDate': data.get('expiryDate', '')
+                    }
+                )
+            else:
+                session_key = request.session.session_key
+                if not session_key:
+                    request.session.create()
+                    session_key = request.session.session_key
+                
+                payment_info, created = UserPaymentInfo.objects.update_or_create(
+                    session_key=session_key,
+                    defaults={
+                        'title': data.get('title', ''),
+                        'firstName': data.get('firstName', ''),
+                        'surname': data.get('surname', ''),
+                        'addressLine1': data.get('addressLine1', ''),
+                        'addressLine2': data.get('addressLine2', ''),
+                        'townCity': data.get('townCity', ''),
+                        'county': data.get('county', ''),
+                        'postcode': data.get('postcode', ''),
+                        'email': data.get('email', ''),
+                        'phone': data.get('phone', ''),
+                        'cardNumberLast4': card_last_4,
+                        'expiryDate': data.get('expiryDate', '')
+                    }
+                )
+            """
+            
+            return JsonResponse({'status': 'success', 'message': 'Payment information saved successfully'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
+    
+    # 准备上下文数据
+    context = {
+        'total_price': total_price,
+        'shopping_cart': cart_items
+    }
+    
+    # 如果有支付信息，添加到上下文中
+    if payment_info:
+        context['payment_info'] = {
+            'title': payment_info.title,
+            'firstName': payment_info.firstName,
+            'surname': payment_info.surname,
+            'addressLine1': payment_info.addressLine1,
+            'addressLine2': payment_info.addressLine2,
+            'townCity': payment_info.townCity,
+            'county': payment_info.county,
+            'postcode': payment_info.postcode,
+            'email': payment_info.email,
+            'phone': payment_info.phone,
+            'cardNumberLast4': payment_info.cardNumberLast4,
+            'expiryDate': payment_info.expiryDate
+        }
+        
+        # 将支付信息存储在session中，以便checkout页面使用
+        request.session['payment_info'] = context['payment_info']
+    
+    return render(request, 'payment_check.html', context)
+
+def checkout(request):
+    # 从session中获取购物车和支付信息
+    cart_items = request.session.get('cart_items', [])
+    payment_info = request.session.get('payment_info', None)
+    
+    # 计算总价
+    total_price = sum(float(item.get('price', 0)) * int(item.get('quantity', 1)) for item in cart_items)
+    
+    context = {
+        'shopping_cart': cart_items,
+        'payment_info': payment_info,
+        'total_price': total_price
+    }
+    
+    return render(request, 'checkout.html', context)
+
+def change_info(request):
+    """变更信息页面 - 返回到购物袋页面"""
+    return redirect('bag')
+
+# 处理订单反馈提交的视图函数
+@csrf_exempt
+def order_feedback(request):
+    """Handle user order feedback submission"""
+    if request.method == 'POST':
+        try:
+            # Parse request data
+            data = json.loads(request.body)
+            order_id = data.get('order_id')
+            feedback_type = data.get('feedback_type')
+            subject = data.get('subject')
+            message = data.get('message')
+            
+            # Validate required fields
+            if not all([order_id, feedback_type, subject, message]):
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Please fill in all required fields'
+                })
+            
+            # Find order
+            try:
+                order = Order.objects.get(id=order_id)
+                
+                # Create feedback
+                feedback = OrderFeedback.objects.create(
+                    order=order,
+                    user=request.user if request.user.is_authenticated else None,
+                    feedback_type=feedback_type,
+                    subject=subject,
+                    message=message
+                )
+                
+                return JsonResponse({
+                    'status': 'success',
+                    'message': 'Feedback submitted successfully, we will reply soon'
+                })
+            except Order.DoesNotExist:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Order not found'
+                })
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return JsonResponse({
+                'status': 'error',
+                'message': f'Submission failed: {str(e)}'
+            })
+    
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Method not supported'
+    })
+
+@login_required
+def order_feedback_history(request, order_id):
+    """Get feedback history for a specific order"""
+    try:
+        feedbacks = OrderFeedback.objects.filter(order_id=order_id).order_by('-created_at')
+        feedback_list = []
+        
+        for feedback in feedbacks:
+            feedback_list.append({
+                'id': feedback.id,
+                'feedback_type': feedback.get_feedback_type_display(),
+                'subject': feedback.subject,
+                'message': feedback.message,
+                'admin_response': feedback.admin_response,
+                'is_resolved': feedback.is_resolved,
+                'created_at': feedback.created_at.strftime('%Y-%m-%d %H:%M')
+            })
+        
+        return JsonResponse({
+            'status': 'success',
+            'feedbacks': feedback_list
+        })
+        
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({'status': 'error', 'message': str(e)})
+
+@staff_member_required
+def admin_feedback_list(request):
+    """Admin view for all feedback"""
+    feedbacks = OrderFeedback.objects.all().order_by('-created_at')
+    return render(request, 'admin/order_feedbacks.html', {'feedbacks': feedbacks})
+
+@staff_member_required
+def admin_feedback_response(request):
+    """Admin response to feedback"""
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            feedback_id = data.get('feedback_id')
+            response = data.get('response')
+            
+            if not all([feedback_id, response]):
+                return JsonResponse({'status': 'error', 'message': 'Missing required fields'})
+            
+            feedback = OrderFeedback.objects.get(id=feedback_id)
+            feedback.admin_response = response
+            feedback.save()
+            
+            return JsonResponse({'status': 'success', 'message': 'Response sent successfully'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': f'Failed to send response: {str(e)}'})
+    
+    return JsonResponse({'status': 'error', 'message': 'Method not supported'})
+
+@staff_member_required
+def admin_feedback_resolve(request):
+    """Mark feedback as resolved"""
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            feedback_id = data.get('feedback_id')
+            
+            feedback = OrderFeedback.objects.get(id=feedback_id)
+            feedback.is_resolved = True
+            feedback.save()
+            
+            return JsonResponse({'status': 'success', 'message': 'Marked as resolved'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': f'Operation failed: {str(e)}'})
+    
+    return JsonResponse({'status': 'error', 'message': 'Method not supported'})
+
+# Admin panel views
+@login_required
+def admin_login(request):
+    """
+    View function for admin login.
+    Only allows staff users to access the admin panel.
+    """
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        
+        user = authenticate(username=username, password=password)
+        
+        if user is not None and user.is_staff:
+            auth_login(request, user)
+            return redirect('admin_dashboard')
+        else:
+            if user is not None and not user.is_staff:
+                error_message = '您不是管理员用户，无法访问管理后台'
+            else:
+                error_message = '用户名或密码错误'
+            
+            return render(request, 'admin/login.html', {'error_message': error_message})
+    
+    return render(request, 'admin/login.html')
+
+@login_required
+def admin_logout(request):
+    """
+    View function for admin logout.
+    """
+    if request.method == 'POST':
+        auth_logout(request)
+        return redirect('admin_login')
+    return redirect('admin_dashboard')
+
+@login_required
+@staff_member_required
+def admin_dashboard(request):
+    """
+    View function for the admin dashboard.
+    Displays three main features: order search, real-time chat, and user message inquiries.
+    """
+    # Get all orders
+    orders = Order.objects.all().order_by('-created_at')
+    
+    # Get active chats (feedbacks with at least one message in the last 24 hours)
+    yesterday = timezone.now() - timezone.timedelta(days=1)
+    active_chats = OrderFeedback.objects.filter(
+        models.Q(messages__created_at__gte=yesterday) | 
+        models.Q(created_at__gte=yesterday)
+    ).distinct().order_by('-messages__created_at')
+    
+    # Get all order feedbacks
+    order_feedbacks = OrderFeedback.objects.all().order_by('-created_at')
+    
+    context = {
+        'orders': orders,
+        'active_chats': active_chats,
+        'order_feedbacks': order_feedbacks,
+    }
+    
+    return render(request, 'admin/dashboard.html', context)
+
+@login_required
+@staff_member_required
+def admin_order_detail(request, order_id):
+    """
+    View function for displaying order details.
+    """
+    order = get_object_or_404(Order, id=order_id)
+    return JsonResponse({
+        'id': order.id,
+        'shipping_name': order.shipping_name,
+        'shipping_email': order.shipping_email,
+        'shipping_phone': order.shipping_phone,
+        'shipping_address': order.shipping_address,
+        'total_amount': str(order.total_amount),
+        'status': order.status,
+        'created_at': order.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+        'items': [
+            {
+                'product_name': item.product_name,
+                'product_price': str(item.product_price),
+                'quantity': item.quantity,
+                'subtotal': str(item.subtotal),
+                'product_image': item.product_image,
+            }
+            for item in order.items.all()
+        ]
+    })
+
+@login_required
+@staff_member_required
+def admin_chat_messages(request, feedback_id):
+    """
+    View function for loading chat messages for a specific feedback.
+    """
+    feedback = get_object_or_404(OrderFeedback, id=feedback_id)
+    messages = feedback.messages.all().order_by('created_at')
+    
+    return JsonResponse({
+        'messages': [
+            {
+                'id': message.id,
+                'message_type': message.message_type,
+                'message': message.message,
+                'created_at': message.created_at.strftime('%H:%M'),
+            }
+            for message in messages
+        ]
+    })
+
+@login_required
+@staff_member_required
+def admin_send_message(request, feedback_id):
+    """
+    View function for sending a message in a chat.
+    """
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    feedback = get_object_or_404(OrderFeedback, id=feedback_id)
+    message_text = request.POST.get('message', '').strip()
+    
+    if not message_text:
+        return JsonResponse({'error': 'Message is required'}, status=400)
+    
+    message = ChatMessage.objects.create(
+        feedback=feedback,
+        order=feedback.order,
+        message_type='agent',
+        message=message_text
+    )
+    
+    return JsonResponse({
+        'id': message.id,
+        'message_type': message.message_type,
+        'message': message.message,
+        'created_at': message.created_at.strftime('%H:%M'),
+    })
+
+@login_required
+@staff_member_required
+def admin_respond_feedback(request, feedback_id):
+    """
+    View function for responding to user feedback.
+    """
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    feedback = get_object_or_404(OrderFeedback, id=feedback_id)
+    response = request.POST.get('response', '').strip()
+    
+    if not response:
+        return JsonResponse({'error': 'Response is required'}, status=400)
+    
+    feedback.admin_response = response
+    feedback.save()
+    
+    return JsonResponse({
+        'id': feedback.id,
+        'admin_response': feedback.admin_response,
+        'updated_at': feedback.updated_at.strftime('%Y-%m-%d %H:%M'),
+    })
+
+@login_required
+@staff_member_required
+def admin_mark_resolved(request, feedback_id):
+    """
+    View function for marking a feedback as resolved.
+    """
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    feedback = get_object_or_404(OrderFeedback, id=feedback_id)
+    feedback.is_resolved = True
+    feedback.save()
+    
+    return JsonResponse({
+        'id': feedback.id,
+        'is_resolved': feedback.is_resolved,
+    })
+
+@login_required
+@staff_member_required
+def admin_update_order_status(request, order_id):
+    """
+    View function for updating order status.
+    """
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    order = get_object_or_404(Order, id=order_id)
+    status = request.POST.get('status')
+    
+    if status not in ['pending', 'processing', 'completed']:
+        return JsonResponse({'error': 'Invalid status'}, status=400)
+    
+    order.status = status
+    order.save()
+    
+    return JsonResponse({
+        'id': order.id,
+        'status': order.status,
+    })

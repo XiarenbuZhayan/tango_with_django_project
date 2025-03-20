@@ -1,0 +1,406 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Checkout - Apple Store{% endblock %}
+
+{% block extra_css %}
+<style>
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        padding-top: 30px;
+    }
+    .back-link {
+        display: inline-block;
+        margin-bottom: 20px;
+        color: #006eff;
+        text-decoration: none;
+    }
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+    .page-header h1 {
+        font-size: 28px;
+        font-weight: 500;
+    }
+    .order-summary-link {
+        color: #006eff;
+        text-decoration: none;
+    }
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 -15px;
+    }
+    .col-md-8 {
+        flex: 0 0 66.666667%;
+        max-width: 66.666667%;
+        padding: 0 15px;
+    }
+    .col-md-4 {
+        flex: 0 0 33.333333%;
+        max-width: 33.333333%;
+        padding: 0 15px;
+    }
+    .checkout-section {
+        background-color: #fff;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    .section-title {
+        font-size: 18px;
+        font-weight: 500;
+    }
+    .change-link {
+        color: #006eff;
+        text-decoration: none;
+        font-size: 14px;
+    }
+    .address-details, .payment-details {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    .detail-item {
+        margin-bottom: 5px;
+    }
+    .order-summary {
+        background-color: #f5f5f7;
+        border-radius: 10px;
+        padding: 20px;
+        position: sticky;
+        top: 20px;
+    }
+    .summary-header {
+        font-size: 18px;
+        font-weight: 500;
+        margin-bottom: 15px;
+    }
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+    .summary-item-title {
+        font-size: 14px;
+    }
+    .summary-item-price {
+        font-size: 14px;
+    }
+    .summary-total {
+        display: flex;
+        justify-content: space-between;
+        padding-top: 15px;
+        margin-top: 15px;
+        border-top: 1px solid #d2d2d7;
+        font-weight: 500;
+    }
+    .place-order-button {
+        width: 100%;
+        background-color: #0071e3;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 20px;
+        font-size: 16px;
+        font-weight: 400;
+        cursor: pointer;
+        margin-top: 20px;
+        transition: background-color 0.3s;
+    }
+    .place-order-button:hover {
+        background-color: #0062c4;
+    }
+    .payment-icon {
+        width: 40px;
+        height: 25px;
+        margin-right: 10px;
+        vertical-align: middle;
+    }
+    .product-list {
+        margin-bottom: 20px;
+    }
+    .product-item {
+        display: flex;
+        margin-bottom: 15px;
+    }
+    .product-image {
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+        margin-right: 15px;
+    }
+    .product-details {
+        flex-grow: 1;
+    }
+    .product-name {
+        font-weight: 500;
+        margin-bottom: 5px;
+    }
+    .product-price {
+        font-weight: 500;
+    }
+    .product-quantity {
+        color: #6e6e73;
+        margin-bottom: 5px;
+    }
+    .delivery-info {
+        color: #6e6e73;
+        margin-top: 10px;
+    }
+    
+    .card-type {
+        font-weight: 500;
+        background-color: #f5f5f7;
+        padding: 2px 6px;
+        border-radius: 4px;
+        margin-right: 5px;
+        font-size: 12px;
+    }
+    
+    /* 显示总价格的样式 */
+    .total-price-header {
+        background-color: #0071e3;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: 500;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Back Button -->
+    <a href="{% url 'payment_check' %}" class="back-link">
+        <i class="fas fa-arrow-left"></i> Back to Payment
+    </a>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>Checkout</h1>
+        <a href="#" class="order-summary-link">Show order summary</a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Shipping Address Section -->
+            <div class="checkout-section">
+                <div class="section-header">
+                    <h2 class="section-title">Shipping Address</h2>
+                    <a href="{% url 'payment_check' %}" class="change-link">Change</a>
+                </div>
+                <div class="address-details">
+                    <div class="detail-item" id="fullNameDisplay">
+                        {% if payment_info %}
+                            {{ payment_info.title }} {{ payment_info.firstName }} {{ payment_info.surname }}
+                        {% else %}
+                            Customer Name
+                        {% endif %}
+                    </div>
+                    <div class="detail-item" id="address1Display">
+                        {% if payment_info %}
+                            {{ payment_info.addressLine1 }}
+                        {% else %}
+                            Address Line 1
+                        {% endif %}
+                    </div>
+                    {% if payment_info and payment_info.addressLine2 %}
+                    <div class="detail-item" id="address2Display">{{ payment_info.addressLine2 }}</div>
+                    {% endif %}
+                    <div class="detail-item" id="cityPostcodeDisplay">
+                        {% if payment_info %}
+                            {{ payment_info.townCity }}, {{ payment_info.postcode }}
+                        {% else %}
+                            City, Postcode
+                        {% endif %}
+                    </div>
+                    {% if payment_info and payment_info.county %}
+                    <div class="detail-item" id="countyDisplay">{{ payment_info.county }}</div>
+                    {% endif %}
+                    <div class="detail-item">United Kingdom</div>
+                    <div class="detail-item" id="phoneDisplay">
+                        {% if payment_info %}
+                            {{ payment_info.phone }}
+                        {% else %}
+                            Phone
+                        {% endif %}
+                    </div>
+                    <div class="detail-item" id="emailDisplay">
+                        {% if payment_info %}
+                            {{ payment_info.email }}
+                        {% else %}
+                            Email
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Method Section -->
+            <div class="checkout-section">
+                <div class="section-header">
+                    <h2 class="section-title">Payment Method</h2>
+                    <a href="{% url 'payment_check' %}" class="change-link">Change</a>
+                </div>
+                <div class="payment-details">
+                    <div class="detail-item">
+                        <img src="{% static 'images/mastercard.png' %}" alt="Mastercard" class="payment-icon">
+                        <span id="cardDisplay">
+                            {% if payment_info and payment_info.cardNumberLast4 %}
+                                <strong class="card-type">
+                                    {% if payment_info.cardNumberLast4|first == "4" %}
+                                        Visa
+                                    {% elif payment_info.cardNumberLast4|first == "5" %}
+                                        Mastercard
+                                    {% elif payment_info.cardNumberLast4|first == "3" %}
+                                        Amex
+                                    {% elif payment_info.cardNumberLast4|first == "6" %}
+                                        Discover
+                                    {% else %}
+                                        Card
+                                    {% endif %}
+                                </strong>
+                                **** **** **** {{ payment_info.cardNumberLast4 }} (Exp: {{ payment_info.expiryDate }})
+                            {% else %}
+                                Card ending in ****
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="detail-item">
+                        Billing address: Same as shipping address
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delivery Method Section -->
+            <div class="checkout-section">
+                <div class="section-header">
+                    <h2 class="section-title">Delivery Method</h2>
+                </div>
+                <div class="delivery-details">
+                    <div class="detail-item">
+                        <strong>Standard Delivery - Free</strong>
+                    </div>
+                    <div class="detail-item">
+                        Delivered in 3-5 business days
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <!-- Order Summary Section -->
+            <div class="order-summary">
+                <h2 class="summary-header">Order Summary</h2>
+                
+                <!-- Products List -->
+                <div class="product-list">
+                    {% for item in shopping_cart %}
+                    <div class="product-item">
+                        <img src="{{ item.image }}" alt="{{ item.name }}" class="product-image">
+                        <div class="product-details">
+                            <div class="product-name">{{ item.name }}</div>
+                            <div class="product-quantity">Qty: {{ item.quantity }}</div>
+                            <div class="product-price">£{{ item.price }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Price Summary -->
+                <div class="summary-item">
+                    <span class="summary-item-title">Subtotal</span>
+                    <span class="summary-item-price">£{{ total_price }}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-item-title">Shipping</span>
+                    <span class="summary-item-price">Free</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-item-title">Tax</span>
+                    <span class="summary-item-price">Included</span>
+                </div>
+                <div class="summary-total">
+                    <span>Total</span>
+                    <span>£{{ total_price }}</span>
+                </div>
+                
+                <button class="place-order-button" id="placeOrderBtn">Place your order</button>
+                
+                <div class="delivery-info">
+                    Estimated delivery: 3-5 business days
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const placeOrderBtn = document.getElementById('placeOrderBtn');
+    
+    placeOrderBtn.addEventListener('click', function() {
+        // 确认下单
+        if (confirm('Are you sure you want to place this order?')) {
+            // 获取最简单的支付方式描述
+            let paymentMethod = 'Card payment';
+            
+            // 收集订单数据
+            const orderData = {
+                shipping_address: {
+                    name: document.getElementById('fullNameDisplay').textContent.trim(),
+                    address1: document.getElementById('address1Display').textContent.trim(),
+                    address2: document.getElementById('address2Display') ? document.getElementById('address2Display').textContent.trim() : '',
+                    city_postcode: document.getElementById('cityPostcodeDisplay').textContent.trim(),
+                    county: document.getElementById('countyDisplay') ? document.getElementById('countyDisplay').textContent.trim() : '',
+                    country: 'United Kingdom',
+                    phone: document.getElementById('phoneDisplay').textContent.trim(),
+                    email: document.getElementById('emailDisplay').textContent.trim()
+                },
+                payment_method: paymentMethod,
+                total_amount: "{{ total_price }}"
+            };
+            
+            // 发送订单数据到后端
+            fetch('{% url "my_orders" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify(orderData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Order placed successfully! Thank you for your purchase.');
+                    window.location.href = '/success/';
+                } else {
+                    alert('Error: ' + (data.message || 'An error occurred while processing your order.'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while processing your order. Please try again.');
+            });
+        }
+    });
+});
+</script>
+{% endblock %} 

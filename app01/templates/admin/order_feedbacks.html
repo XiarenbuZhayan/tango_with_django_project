@@ -1,0 +1,365 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block title %}Order Feedbacks - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="bg-white rounded h-100 p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h6 class="mb-0">Order Feedback Management</h6>
+                </div>
+                
+                <!-- Feedback filters -->
+                <div class="feedback-filters mb-4">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="pending">Pending</button>
+                    <button class="filter-btn" data-filter="resolved">Resolved</button>
+                    <button class="filter-btn" data-filter="question">Questions</button>
+                    <button class="filter-btn" data-filter="problem">Problems</button>
+                    <button class="filter-btn" data-filter="suggestion">Suggestions</button>
+                </div>
+
+                <!-- Feedback list -->
+                <div class="feedback-list">
+                    {% for feedback in feedbacks %}
+                    <div class="feedback-item{% if feedback.is_resolved %} resolved{% endif %}" 
+                         data-type="{{ feedback.feedback_type }}" 
+                         data-status="{% if feedback.is_resolved %}resolved{% else %}pending{% endif %}">
+                        <div class="feedback-header" onclick="toggleFeedback(this)">
+                            <div class="feedback-meta">
+                                <span class="feedback-id">Feedback #{{ feedback.id }}</span>
+                                <span class="feedback-order">Order #{{ feedback.order.id }}</span>
+                                <span class="feedback-type {{ feedback.feedback_type }}">
+                                    {{ feedback.get_feedback_type_display }}
+                                </span>
+                                <span class="feedback-status {% if feedback.is_resolved %}resolved{% else %}pending{% endif %}">
+                                    {% if feedback.is_resolved %}Resolved{% else %}Pending{% endif %}
+                                </span>
+                            </div>
+                            <div class="feedback-info">
+                                <span class="feedback-date">{{ feedback.created_at|date:"Y-m-d H:i" }}</span>
+                                <span class="feedback-toggle">▼</span>
+                            </div>
+                        </div>
+                        <div class="feedback-content" style="display: none;">
+                            <div class="feedback-subject">{{ feedback.subject }}</div>
+                            <div class="feedback-message">{{ feedback.message }}</div>
+                            
+                            {% if feedback.admin_response %}
+                            <div class="admin-response">
+                                <strong>Admin Response:</strong>
+                                <p>{{ feedback.admin_response }}</p>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="response-form">
+                                <textarea class="form-control" placeholder="Enter your response..."></textarea>
+                                <div class="response-actions">
+                                    <button class="btn btn-primary btn-sm" onclick="sendResponse('{{ feedback.id }}', this)">
+                                        Reply
+                                    </button>
+                                    {% if not feedback.is_resolved %}
+                                    <button class="btn btn-success btn-sm" onclick="markResolved('{{ feedback.id }}', this)">
+                                        Mark as Resolved
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="feedback-empty">
+                        <p>No feedback found</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .feedback-filters {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    
+    .filter-btn {
+        padding: 6px 12px;
+        border: 1px solid #ddd;
+        background: #f8f9fa;
+        border-radius: 20px;
+        cursor: pointer;
+    }
+    
+    .filter-btn.active {
+        background: #0d6efd;
+        color: white;
+        border-color: #0d6efd;
+    }
+    
+    .feedback-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .feedback-item {
+        border: 1px solid #eee;
+        border-radius: 6px;
+        overflow: hidden;
+    }
+    
+    .feedback-header {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 15px;
+        background: #f8f9fa;
+        cursor: pointer;
+    }
+    
+    .feedback-meta, .feedback-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .feedback-type, .feedback-status {
+        padding: 3px 8px;
+        border-radius: 20px;
+        font-size: 12px;
+    }
+    
+    .feedback-type.question {
+        background: #cfe2ff;
+        color: #084298;
+    }
+    
+    .feedback-type.problem {
+        background: #f8d7da;
+        color: #842029;
+    }
+    
+    .feedback-type.suggestion {
+        background: #fff3cd;
+        color: #664d03;
+    }
+    
+    .feedback-status.pending {
+        background: #fff3cd;
+        color: #664d03;
+    }
+    
+    .feedback-status.resolved {
+        background: #d1e7dd;
+        color: #0f5132;
+    }
+    
+    .feedback-item.resolved {
+        opacity: 0.7;
+    }
+    
+    .feedback-content {
+        padding: 15px;
+        border-top: 1px solid #eee;
+    }
+    
+    .feedback-subject {
+        font-weight: 500;
+        margin-bottom: 10px;
+    }
+    
+    .feedback-message {
+        background: #f8f9fa;
+        padding: 12px;
+        border-radius: 6px;
+        margin-bottom: 15px;
+    }
+    
+    .admin-response {
+        background: #e9f5ff;
+        padding: 12px;
+        border-radius: 6px;
+        margin-bottom: 15px;
+    }
+    
+    .response-form textarea {
+        margin-bottom: 10px;
+    }
+    
+    .response-actions {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .feedback-empty {
+        padding: 30px;
+        text-align: center;
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function toggleFeedback(element) {
+        const content = element.parentElement.querySelector('.feedback-content');
+        const toggle = element.querySelector('.feedback-toggle');
+        
+        if (content.style.display === 'none') {
+            content.style.display = 'block';
+            toggle.textContent = '▲';
+        } else {
+            content.style.display = 'none';
+            toggle.textContent = '▼';
+        }
+    }
+    
+    function sendResponse(feedbackId, button) {
+        const responseForm = button.closest('.response-form');
+        const textarea = responseForm.querySelector('textarea');
+        const response = textarea.value.trim();
+        
+        if (!response) {
+            alert('Please enter a response');
+            return;
+        }
+        
+        const originalText = button.textContent;
+        button.textContent = 'Sending...';
+        button.disabled = true;
+        
+        fetch('/admin-feedback-response/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                feedback_id: feedbackId,
+                response: response
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert('Response sent successfully');
+                // Add response to UI
+                const feedbackContent = button.closest('.feedback-content');
+                let adminResponse = feedbackContent.querySelector('.admin-response');
+                
+                if (!adminResponse) {
+                    adminResponse = document.createElement('div');
+                    adminResponse.className = 'admin-response';
+                    adminResponse.innerHTML = '<strong>Admin Response:</strong>';
+                    const p = document.createElement('p');
+                    adminResponse.appendChild(p);
+                    
+                    feedbackContent.insertBefore(adminResponse, responseForm);
+                }
+                
+                adminResponse.querySelector('p').textContent = response;
+                textarea.value = '';
+            } else {
+                alert('Failed to send response: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to send response, please try again later');
+        })
+        .finally(() => {
+            button.textContent = originalText;
+            button.disabled = false;
+        });
+    }
+    
+    function markResolved(feedbackId, button) {
+        if (!confirm('Are you sure you want to mark this feedback as resolved?')) {
+            return;
+        }
+        
+        const originalText = button.textContent;
+        button.textContent = 'Processing...';
+        button.disabled = true;
+        
+        fetch('/admin-feedback-resolve/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                feedback_id: feedbackId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert('Marked as resolved');
+                // Update UI
+                const feedbackItem = button.closest('.feedback-item');
+                feedbackItem.classList.add('resolved');
+                
+                const statusSpan = feedbackItem.querySelector('.feedback-status');
+                statusSpan.textContent = 'Resolved';
+                statusSpan.classList.remove('pending');
+                statusSpan.classList.add('resolved');
+                
+                // Remove resolve button
+                button.remove();
+            } else {
+                alert('Operation failed: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Operation failed, please try again later');
+        });
+    }
+    
+    // Filter feedback
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            const filter = this.getAttribute('data-filter');
+            const items = document.querySelectorAll('.feedback-item');
+            
+            items.forEach(item => {
+                if (filter === 'all') {
+                    item.style.display = 'block';
+                } else if (filter === 'pending' || filter === 'resolved') {
+                    item.style.display = item.getAttribute('data-status') === filter ? 'block' : 'none';
+                } else {
+                    item.style.display = item.getAttribute('data-type') === filter ? 'block' : 'none';
+                }
+            });
+        });
+    });
+    
+    // Get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %} 

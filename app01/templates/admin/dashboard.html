@@ -1,0 +1,761 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Admin Dashboard - Apple Store{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background-color: #f5f5f7;
+    }
+    
+    .admin-container {
+        max-width: 1200px;
+        margin: 30px auto;
+        padding: 0 15px;
+    }
+    
+    .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .admin-title h1 {
+        font-size: 24px;
+        font-weight: 500;
+        color: #333;
+        margin: 0;
+    }
+    
+    .admin-title span {
+        color: #0071e3;
+    }
+    
+    .admin-user {
+        display: flex;
+        align-items: center;
+    }
+    
+    .admin-user .user-name {
+        margin-right: 15px;
+        font-size: 14px;
+    }
+    
+    .admin-user .logout-btn {
+        background-color: #f5f5f7;
+        color: #666;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.2s;
+    }
+    
+    .admin-user .logout-btn:hover {
+        background-color: #e5e5e5;
+    }
+    
+    .feature-cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 30px;
+        margin-bottom: 30px;
+    }
+    
+    .feature-card {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        padding: 25px;
+        text-align: center;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .feature-card.active {
+        border: 2px solid #0071e3;
+    }
+    
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: #f5f5f7;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px;
+    }
+    
+    .feature-icon i {
+        font-size: 24px;
+        color: #0071e3;
+    }
+    
+    .feature-title {
+        font-size: 18px;
+        font-weight: 500;
+        margin-bottom: 10px;
+    }
+    
+    .feature-desc {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 15px;
+    }
+    
+    .badge {
+        display: inline-block;
+        background-color: #ff3b30;
+        color: white;
+        font-size: 12px;
+        padding: 3px 8px;
+        border-radius: 20px;
+    }
+    
+    .content-section {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        padding: 25px;
+        min-height: 500px;
+    }
+    
+    /* Order search section */
+    .search-bar {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .search-input {
+        flex-grow: 1;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+    
+    .search-btn {
+        background-color: #0071e3;
+        color: white;
+        border: none;
+        padding: 0 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    
+    .order-filters {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .filter-item {
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 14px;
+        cursor: pointer;
+        background-color: #f5f5f7;
+    }
+    
+    .filter-item.active {
+        background-color: #0071e3;
+        color: white;
+    }
+    
+    .order-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .order-table th, .order-table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .order-table th {
+        font-weight: 500;
+        color: #666;
+        background-color: #f5f5f7;
+    }
+    
+    .order-table tr:hover {
+        background-color: #f9f9f9;
+    }
+    
+    .status-badge {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+    }
+    
+    .status-completed {
+        background-color: #34c759;
+        color: white;
+    }
+    
+    .status-processing {
+        background-color: #5ac8fa;
+        color: white;
+    }
+    
+    .status-pending {
+        background-color: #ffcc00;
+        color: white;
+    }
+    
+    .action-btn {
+        background-color: transparent;
+        border: 1px solid #ddd;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        transition: background-color 0.2s;
+    }
+    
+    .action-btn:hover {
+        background-color: #f5f5f7;
+    }
+    
+    /* Feedback section */
+    .feedback-list {
+        margin-bottom: 20px;
+    }
+    
+    .feedback-item {
+        border: 1px solid #eee;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        overflow: hidden;
+    }
+    
+    .feedback-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        background-color: #f5f5f7;
+        cursor: pointer;
+    }
+    
+    .feedback-title {
+        font-weight: 500;
+    }
+    
+    .feedback-type {
+        background-color: #5ac8fa;
+        color: white;
+        padding: 3px 8px;
+        border-radius: 20px;
+        font-size: 12px;
+        margin-right: 10px;
+    }
+    
+    .feedback-type.problem {
+        background-color: #ff3b30;
+    }
+    
+    .feedback-type.suggestion {
+        background-color: #ffcc00;
+    }
+    
+    .feedback-content {
+        padding: 15px;
+        display: none;
+    }
+    
+    .feedback-content.active {
+        display: block;
+    }
+    
+    .feedback-message {
+        margin-bottom: 15px;
+        padding: 15px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+    }
+    
+    .feedback-response {
+        margin-top: 15px;
+    }
+    
+    .feedback-response textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+        resize: vertical;
+        min-height: 100px;
+        margin-bottom: 15px;
+    }
+    
+    .feedback-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+    
+    .resolve-btn {
+        background-color: #34c759;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    
+    .send-response-btn {
+        background-color: #0071e3;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    
+    .message {
+        margin: 10px;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .message.user {
+        align-items: flex-start;
+    }
+    
+    .message.admin {
+        align-items: flex-end;
+    }
+    
+    .message-content {
+        max-width: 70%;
+        padding: 10px;
+        border-radius: 10px;
+        position: relative;
+    }
+    
+    .message.user .message-content {
+        background-color: #f0f0f0;
+    }
+    
+    .message.admin .message-content {
+        background-color: #007bff;
+        color: white;
+    }
+    
+    .message-time {
+        font-size: 0.8em;
+        color: #666;
+        margin-top: 5px;
+    }
+    
+    .message.admin .message-time {
+        color: #ddd;
+    }
+    
+    .chat-input {
+        display: flex;
+        padding: 10px;
+        border-top: 1px solid #ddd;
+    }
+    
+    .chat-input input {
+        flex: 1;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        margin-right: 10px;
+    }
+    
+    .chat-input button {
+        padding: 8px 15px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    
+    .chat-input button:hover {
+        background-color: #0056b3;
+    }
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    {% csrf_token %}
+    <div class="admin-header">
+        <div class="admin-title">
+            <h1>Admin <span>Dashboard</span></h1>
+        </div>
+        <div class="admin-user">
+            <div class="user-name">Welcome, {{ request.user.username }}</div>
+            <form action="{% url 'admin_logout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="feature-cards">
+        <div class="feature-card active" data-section="orders">
+            <div class="feature-icon">
+                <i class="fas fa-shopping-bag"></i>
+            </div>
+            <div class="feature-title">Order Management</div>
+            <div class="feature-desc">View and manage all orders</div>
+        </div>
+        
+        <div class="feature-card" data-section="feedback" onclick="window.location.href='/admin-feedback-list/'">
+            <div class="feature-icon">
+                <i class="fas fa-envelope"></i>
+            </div>
+            <div class="feature-title">Order Feedbacks</div>
+            <div class="feature-desc">View and respond to customer feedback</div>
+            <div class="badge">5</div>
+        </div>
+    </div>
+    
+    <div class="content-section" id="orders-section">
+        <div class="search-bar">
+            <input type="text" class="search-input" placeholder="Search by order #, customer name or email...">
+            <button class="search-btn">Search</button>
+        </div>
+        
+        <div class="order-filters">
+            <div class="filter-item active">All Orders</div>
+            <div class="filter-item">Pending</div>
+            <div class="filter-item">Processing</div>
+            <div class="filter-item">Completed</div>
+        </div>
+        
+        <table class="order-table">
+            <thead>
+                <tr>
+                    <th>Order #</th>
+                    <th>Customer</th>
+                    <th>Products</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>#{{ order.id }}</td>
+                    <td>{{ order.shipping_name }}</td>
+                    <td>
+                        {% if order.items.count > 1 %}
+                            {{ order.items.first.product_name }} and {{ order.items.count }} other items
+                        {% else %}
+                            {{ order.items.first.product_name }}
+                        {% endif %}
+                    </td>
+                    <td>${{ order.total_amount }}</td>
+                    <td>
+                        <span class="status-badge 
+                            {% if order.status == 'completed' %}status-completed
+                            {% elif order.status == 'processing' %}status-processing
+                            {% else %}status-pending{% endif %}">
+                            {{ order.get_status_display }}
+                        </span>
+                    </td>
+                    <td>{{ order.created_at|date:"Y-m-d H:i" }}</td>
+                    <td>
+                        <button class="action-btn view-order" data-id="{{ order.id }}">View</button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" style="text-align: center;">No orders found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="content-section" id="feedback-section" style="display: none;">
+        <div class="order-filters">
+            <div class="filter-item active">All Messages</div>
+            <div class="filter-item">Unresolved</div>
+            <div class="filter-item">Resolved</div>
+        </div>
+        
+        <div class="feedback-list">
+            {% for feedback in order_feedbacks %}
+            <div class="feedback-item">
+                <div class="feedback-header" data-id="{{ feedback.id }}">
+                    <div>
+                        <span class="feedback-type {{ feedback.feedback_type }}">
+                            {{ feedback.get_feedback_type_display }}
+                        </span>
+                        <span class="feedback-title">{{ feedback.subject }}</span>
+                    </div>
+                    <div>
+                        <small>Order #{{ feedback.order.id }} | {{ feedback.created_at|date:"Y-m-d H:i" }}</small>
+                        {% if feedback.is_resolved %}
+                        <span class="status-badge status-completed">Resolved</span>
+                        {% else %}
+                        <span class="status-badge status-pending">Pending</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="feedback-content">
+                    <div class="feedback-message">
+                        <strong>{{ feedback.user.username|default:"Anonymous User" }}</strong> ({{ feedback.created_at|date:"Y-m-d H:i" }})<br>
+                        {{ feedback.message }}
+                    </div>
+                    
+                    {% if feedback.admin_response %}
+                    <div class="feedback-message">
+                        <strong>Admin Response</strong> ({{ feedback.updated_at|date:"Y-m-d H:i" }})<br>
+                        {{ feedback.admin_response }}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="feedback-response">
+                        <textarea placeholder="Enter your response..."></textarea>
+                        <div class="feedback-actions">
+                            {% if not feedback.is_resolved %}
+                            <button class="resolve-btn" data-id="{{ feedback.id }}">Mark as Resolved</button>
+                            {% endif %}
+                            <button class="send-response-btn" data-id="{{ feedback.id }}">Send Response</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div style="text-align: center; padding: 50px; color: #999;">
+                No user messages found
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% include "admin/order_modal.html" %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Tab switching
+    document.querySelectorAll('.feature-card').forEach(card => {
+        card.addEventListener('click', function() {
+            // Update active card
+            document.querySelectorAll('.feature-card').forEach(c => c.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Show relevant section
+            const section = this.getAttribute('data-section');
+            document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
+            document.getElementById(section + '-section').style.display = 'block';
+        });
+    });
+    
+    // Feedback expandable sections
+    document.querySelectorAll('.feedback-header').forEach(header => {
+        header.addEventListener('click', function() {
+            const content = this.nextElementSibling;
+            const isActive = content.classList.contains('active');
+            
+            // Close all open feedback items
+            document.querySelectorAll('.feedback-content').forEach(c => c.classList.remove('active'));
+            
+            // Toggle current item
+            if (!isActive) {
+                content.classList.add('active');
+            }
+        });
+    });
+    
+    // Order details modal handling
+    document.querySelectorAll('.view-order').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const orderId = this.getAttribute('data-id');
+            loadOrderDetails(orderId);
+        });
+    });
+    
+    function loadOrderDetails(orderId) {
+        fetch(`/admin-order/${orderId}/`)
+            .then(response => response.json())
+            .then(data => {
+                // Populate the modal with order details
+                document.getElementById('orderIdDisplay').textContent = data.id;
+                document.getElementById('orderNumber').textContent = data.id;
+                document.getElementById('customerName').textContent = data.shipping_name;
+                document.getElementById('customerEmail').textContent = data.shipping_email;
+                document.getElementById('customerPhone').textContent = data.shipping_phone;
+                document.getElementById('customerAddress').textContent = data.shipping_address;
+                document.getElementById('orderDate').textContent = data.created_at;
+                document.getElementById('orderTotal').textContent = data.total_amount;
+                
+                // Set order status
+                const statusBadge = document.getElementById('orderStatus');
+                statusBadge.textContent = data.status === 'completed' ? 'Completed' : 
+                                         data.status === 'processing' ? 'Processing' : 'Pending';
+                statusBadge.className = 'status-badge ' + 
+                                       (data.status === 'completed' ? 'status-completed' : 
+                                        data.status === 'processing' ? 'status-processing' : 'status-pending');
+                
+                // Set the selected status in the dropdown
+                document.getElementById('statusSelect').value = data.status;
+                
+                // Populate order items
+                const itemsTable = document.getElementById('orderItemsTable');
+                itemsTable.innerHTML = '';
+                
+                data.items.forEach(item => {
+                    const row = document.createElement('tr');
+                    
+                    const nameCell = document.createElement('td');
+                    nameCell.className = 'item-info';
+                    if (item.product_image) {
+                        const img = document.createElement('img');
+                        img.src = item.product_image;
+                        img.alt = item.product_name;
+                        img.className = 'item-image';
+                        nameCell.appendChild(img);
+                    }
+                    nameCell.appendChild(document.createTextNode(item.product_name));
+                    
+                    const priceCell = document.createElement('td');
+                    priceCell.textContent = '$' + item.product_price;
+                    
+                    const quantityCell = document.createElement('td');
+                    quantityCell.textContent = item.quantity;
+                    
+                    const subtotalCell = document.createElement('td');
+                    subtotalCell.textContent = '$' + item.subtotal;
+                    
+                    row.appendChild(nameCell);
+                    row.appendChild(priceCell);
+                    row.appendChild(quantityCell);
+                    row.appendChild(subtotalCell);
+                    
+                    itemsTable.appendChild(row);
+                });
+                
+                // Show the modal
+                document.getElementById('orderModalBackdrop').style.display = 'flex';
+            })
+            .catch(error => {
+                console.error('Error loading order details:', error);
+                alert('Unable to load order details. Please try again later.');
+            });
+    }
+    
+    // Close modal buttons
+    document.querySelector('.modal-close-btn').addEventListener('click', function() {
+        document.getElementById('orderModalBackdrop').style.display = 'none';
+    });
+    
+    document.querySelector('.close-modal-btn').addEventListener('click', function() {
+        document.getElementById('orderModalBackdrop').style.display = 'none';
+    });
+    
+    // Click outside to close
+    document.getElementById('orderModalBackdrop').addEventListener('click', function(event) {
+        if (event.target === this) {
+            this.style.display = 'none';
+        }
+    });
+    
+    // Update order status
+    document.querySelector('.update-status-btn').addEventListener('click', function() {
+        const orderId = document.getElementById('orderIdDisplay').textContent;
+        const status = document.getElementById('statusSelect').value;
+        
+        // Create form data for the POST request
+        const formData = new FormData();
+        formData.append('status', status);
+        
+        // Send AJAX request to update status
+        fetch(`/admin-update-order/${orderId}/`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Order status updated:', data);
+            
+            // Update the UI
+            const statusBadge = document.getElementById('orderStatus');
+            statusBadge.textContent = status === 'completed' ? 'Completed' : 
+                                     status === 'processing' ? 'Processing' : 'Pending';
+            statusBadge.className = 'status-badge ' + 
+                                   (status === 'completed' ? 'status-completed' : 
+                                    status === 'processing' ? 'status-processing' : 'status-pending');
+            
+            // Also update the status in the table
+            const ordersTable = document.querySelector('.order-table');
+            const rows = ordersTable.querySelectorAll('tbody tr');
+            for (const row of rows) {
+                const idCell = row.querySelector('td:first-child');
+                if (idCell && idCell.textContent === `#${orderId}`) {
+                    const statusCell = row.querySelector('td:nth-child(5) .status-badge');
+                    if (statusCell) {
+                        statusCell.textContent = status === 'completed' ? 'Completed' : 
+                                               status === 'processing' ? 'Processing' : 'Pending';
+                        statusCell.className = 'status-badge ' + 
+                                             (status === 'completed' ? 'status-completed' : 
+                                              status === 'processing' ? 'status-processing' : 'status-pending');
+                    }
+                    break;
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error updating order status:', error);
+            alert('Failed to update order status. Please try again later.');
+        });
+    });
+
+    // getCookie函数 - 用于获取CSRF令牌
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %} 

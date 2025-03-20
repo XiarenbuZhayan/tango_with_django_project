@@ -1,0 +1,198 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+<style>
+    .feedback-container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+    
+    .feedback-header {
+        border-bottom: 1px solid #eaeaea;
+        padding-bottom: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .feedback-details {
+        margin-bottom: 30px;
+        color: #4a5568;
+    }
+    
+    .feedback-details p {
+        margin: 8px 0;
+    }
+    
+    .feedback-details strong {
+        font-weight: 600;
+        display: inline-block;
+        min-width: 120px;
+        color: #2d3748;
+    }
+    
+    .message-container {
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        white-space: pre-wrap;
+        color: #4a5568;
+    }
+    
+    .response-container {
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .response-container textarea {
+        width: 100%;
+        min-height: 150px;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 12px;
+        margin-bottom: 15px;
+        font-family: inherit;
+        color: #4a5568;
+    }
+    
+    .response-actions {
+        text-align: right;
+    }
+    
+    .btn-primary {
+        background-color: #4f46e5;
+        color: white;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.2s;
+    }
+    
+    .btn-primary:hover {
+        background-color: #4338ca;
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        margin-left: 10px;
+    }
+    
+    .status-pending {
+        background-color: #fef3c7;
+        color: #92400e;
+    }
+    
+    .status-resolved {
+        background-color: #dcfce7;
+        color: #166534;
+    }
+    
+    h1, h3 {
+        color: #2d3748;
+    }
+    
+    h3 {
+        margin-top: 25px;
+        font-size: 18px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="feedback-container">
+    <div class="feedback-header">
+        <h1>Order Feedback #{{ feedback.id }}</h1>
+        {% if feedback.is_resolved %}
+            <span class="status-badge status-resolved">Resolved</span>
+        {% else %}
+            <span class="status-badge status-pending">Pending</span>
+        {% endif %}
+    </div>
+    
+    <div class="feedback-details">
+        <p><strong>Order Number:</strong> {{ feedback.order.id }}</p>
+        <p><strong>Customer:</strong> {{ feedback.order.shipping_name }}</p>
+        <p><strong>Feedback Type:</strong> {{ feedback.get_feedback_type_display }}</p>
+        <p><strong>Subject:</strong> {{ feedback.subject }}</p>
+        <p><strong>Submitted:</strong> {{ feedback.created_at|date:"Y-m-d H:i" }}</p>
+    </div>
+    
+    <h3>Customer Message</h3>
+    <div class="message-container">
+        {{ feedback.message }}
+    </div>
+    
+    {% if feedback.admin_response %}
+    <h3>Admin Response</h3>
+    <div class="message-container">
+        {{ feedback.admin_response }}
+    </div>
+    {% else %}
+    <div class="response-container">
+        <h3>Reply to Customer</h3>
+        <form id="responseForm" method="post">
+            {% csrf_token %}
+            <textarea id="responseText" name="response" placeholder="Type your response here..."></textarea>
+            <div class="response-actions">
+                <button type="submit" class="btn-primary">Submit Response</button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+    
+    <div class="actions">
+        <a href="{% url 'admin:app01_orderfeedback_changelist' %}" class="btn-primary">Back to List</a>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('responseForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const response = document.getElementById('responseText').value;
+            if (!response.trim()) {
+                alert('Please enter a response');
+                return;
+            }
+            
+            fetch(window.location.href, {
+                method: 'POST',
+                body: new FormData(form),
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    window.location.reload();
+                } else {
+                    alert('Failed to send response. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while submitting');
+            });
+        });
+    }
+});
+</script>
+{% endblock %} 

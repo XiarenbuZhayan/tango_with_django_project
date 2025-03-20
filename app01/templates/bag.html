@@ -255,7 +255,7 @@
                     <span>Total</span>
                     <span>£{{ total_price }}</span>
                 </div>
-                <button class="checkout-btn">Check Out</button>
+                <button class="checkout-btn" id="checkoutBtn">Check Out</button>
             </div>
         {% else %}
             <h1 class="bag-title">Your bag is empty.</h1>
@@ -283,6 +283,14 @@
         quantitySelects.forEach(select => {
             select.addEventListener('change', updateQuantity);
         });
+        
+        // 添加结账按钮的点击事件监听
+        const checkoutBtn = document.getElementById('checkoutBtn');
+        if (checkoutBtn) {
+            checkoutBtn.addEventListener('click', function() {
+                window.location.href = "{% url 'payment_check' %}";
+            });
+        }
     });
     
     // 更新商品数量

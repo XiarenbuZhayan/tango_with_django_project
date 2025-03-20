@@ -1,0 +1,885 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Confirm Payment Information - Apple Store{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background-color: #fff;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    
+    /* 信用卡类型样式 */
+    #cardTypeDisplay {
+        font-weight: 500;
+        margin-right: 5px;
+    }
+    
+    #cardTypeDisplay.Visa {
+        color: #1A1F71;
+    }
+    
+    #cardTypeDisplay.Mastercard {
+        color: #EB001B;
+    }
+    
+    #cardTypeDisplay.American-Express {
+        color: #006FCF;
+    }
+    
+    #cardTypeDisplay.Discover {
+        color: #FF6600;
+    }
+    
+    #cardTypeDisplay.JCB {
+        color: #0E4C96;
+    }
+    
+    #cardTypeDisplay.Diners-Club {
+        color: #004A97;
+    }
+    
+    /* 卡片输入组样式 */
+    .card-input-group {
+        display: block;
+        position: relative;
+    }
+    
+    .card-type-icon {
+        display: none;
+    }
+    
+    #cardNumber {
+        padding-left: 8px;
+    }
+    
+    .back-link {
+        color: #000;
+        text-decoration: none;
+        font-size: 14px;
+        margin-bottom: 20px;
+        display: inline-block;
+    }
+    
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+    
+    .page-header h1 {
+        font-size: 24px;
+        margin: 0;
+    }
+    
+    .order-summary-link {
+        color: #0066CC;
+        text-decoration: none;
+        font-size: 14px;
+    }
+    
+    .form-section {
+        margin-bottom: 30px;
+    }
+    
+    .form-section h2 {
+        font-size: 16px;
+        margin-bottom: 15px;
+    }
+    
+    .address-box {
+        border: 1px solid #d2d2d7;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+    
+    .address-info {
+        font-size: 14px;
+    }
+    
+    .address-info strong {
+        display: block;
+        margin-bottom: 5px;
+    }
+    
+    .default-badge {
+        font-size: 12px;
+        color: #86868b;
+    }
+    
+    .edit-link {
+        color: #0066CC;
+        text-decoration: none;
+        font-size: 14px;
+        margin-top: 5px;
+        display: inline-block;
+    }
+    
+    .new-address-btn {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #d2d2d7;
+        border-radius: 8px;
+        background: #fff;
+        font-size: 14px;
+        cursor: pointer;
+    }
+    
+    .form-control {
+        border: 1px solid #d2d2d7;
+        border-radius: 8px;
+        padding: 8px;
+        margin-bottom: 10px;
+        width: 100%;
+        font-size: 14px;
+    }
+    
+    .form-row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+    
+    .form-row .form-control {
+        margin-bottom: 0;
+    }
+    
+    .area-code {
+        width: 100px;
+    }
+    
+    .phone-number {
+        flex: 1;
+    }
+    
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        margin: 15px 0;
+    }
+    
+    .payment-option {
+        border: 1px solid #d2d2d7;
+        border-radius: 8px;
+        padding: 8px 15px;
+        margin-bottom: 10px;
+        cursor: pointer;
+    }
+    
+    .card-info {
+        border: 1px solid #d2d2d7;
+        border-radius: 8px;
+        padding: 8px 15px;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .saved-card {
+        background: #f5f5f7;
+        border-radius: 4px;
+        padding: 4px 8px;
+        font-size: 12px;
+    }
+    
+    .review-button {
+        background: #0071e3;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 12px;
+        width: 100%;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+    
+    .edit-form {
+        display: none;
+        background: white;
+        border: 1px solid #d2d2d7;
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 10px;
+    }
+    
+    .edit-form h3 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .edit-form .form-control {
+        border: 1px solid #d2d2d7;
+        border-radius: 8px;
+        padding: 8px;
+        margin-bottom: 5px;
+        width: 100%;
+        font-size: 14px;
+    }
+    
+    .edit-form .form-control.error {
+        border-color: #ff3b30;
+        background-color: #fff2f2;
+    }
+    
+    .edit-form .error-message {
+        color: #ff3b30;
+        font-size: 12px;
+        margin-bottom: 10px;
+        display: none;
+    }
+    
+    .edit-form select {
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 16px;
+        padding-right: 30px;
+    }
+    
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    .optional-text {
+        color: #86868b;
+        font-size: 12px;
+    }
+    
+    .edit-form-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    
+    .edit-form-buttons button {
+        padding: 8px 15px;
+        border-radius: 6px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+    
+    .btn-cancel {
+        background: transparent;
+        border: 1px solid #d2d2d7;
+    }
+    
+    .btn-save {
+        background: #0071e3;
+        color: white;
+        border: none;
+    }
+    
+    .title-dropdown {
+        position: absolute;
+        width: 100%;
+        background: white;
+        border: 1px solid #d2d2d7;
+        border-radius: 8px;
+        margin-top: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        z-index: 1000;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+    
+    .dropdown-item {
+        padding: 8px 15px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    
+    .dropdown-item:hover {
+        background-color: #f5f5f7;
+    }
+    
+    .form-group {
+        position: relative;
+    }
+    
+    #editTitle {
+        cursor: pointer;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 16px;
+        padding-right: 30px;
+    }
+    
+    #cardTypeText {
+        font-weight: 500;
+        margin-right: 5px;
+        display: inline-block;
+        position: absolute;
+        right: 10px;
+        top: 8px;
+        font-size: 12px;
+        background-color: #f5f5f7;
+        padding: 2px 6px;
+        border-radius: 4px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Back Button -->
+    <a href="{% url 'bag' %}" class="back-link">
+        <i class="fas fa-arrow-left"></i> Back to Change products
+    </a>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>Confirm Payment Information</h1>
+        <a href="#" class="order-summary-link">show order summary: £{{ total_price }}</a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <!-- Address Section -->
+            <div class="form-section">
+                <h2>Select an address:</h2>
+                <div class="address-box">
+                    <div class="address-info">
+                        <strong id="nameDisplay">
+                            {% if payment_info %}
+                                {{ payment_info.title }} {{ payment_info.firstName }} {{ payment_info.surname }}
+                            {% else %}
+                                Title
+                            {% endif %}
+                        </strong>
+                        <div id="addressDisplay">
+                            {% if payment_info %}
+                                {{ payment_info.addressLine1 }}{% if payment_info.addressLine2 %}, {{ payment_info.addressLine2 }}{% endif %}, {{ payment_info.townCity }}{% if payment_info.county %}, {{ payment_info.county }}{% endif %}, {{ payment_info.postcode }}
+                            {% else %}
+                                Address
+                            {% endif %}
+                        </div>
+                        <a href="#" class="edit-link" id="editAddressBtn">Edit</a>
+                    </div>
+                    <span class="default-badge">default</span>
+                </div>
+                
+                <button class="new-address-btn" id="newAddressBtn">Use a new address</button>
+                
+                <div id="newAddressForm" style="display: none;">
+                    <input type="text" class="form-control" placeholder="Title">
+                    <input type="text" class="form-control" placeholder="First Name">
+                    <input type="text" class="form-control" placeholder="Surname">
+                    <input type="text" class="form-control" placeholder="Address">
+                    <div class="form-row">
+                        <input type="text" class="form-control" placeholder="City/Country">
+                        <input type="text" class="form-control" placeholder="Postcode">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 编辑地址表单 -->
+            <div class="edit-form" id="editAddressForm">
+                <h3>Edit Address</h3>
+                <div class="form-group">
+                    <input type="text" class="form-control" id="editTitle" placeholder="Title" readonly value="{% if payment_info %}{{ payment_info.title }}{% endif %}">
+                    <div class="title-dropdown" id="titleDropdown" style="display: none;">
+                        <div class="dropdown-item" data-value="Mr">Mr</div>
+                        <div class="dropdown-item" data-value="Mrs">Mrs</div>
+                        <div class="dropdown-item" data-value="Miss">Miss</div>
+                        <div class="dropdown-item" data-value="Ms">Ms</div>
+                        <div class="dropdown-item" data-value="Dr">Dr</div>
+                        <div class="dropdown-item" data-value="Professor">Professor</div>
+                        <div class="dropdown-item" data-value="Rev">Rev</div>
+                        <div class="dropdown-item" data-value="Sir">Sir</div>
+                        <div class="dropdown-item" data-value="Lady">Lady</div>
+                        <div class="dropdown-item" data-value="Lord">Lord</div>
+                        <div class="dropdown-item" data-value="Dame">Dame</div>
+                        <div class="dropdown-item" data-value="Capt">Capt</div>
+                        <div class="dropdown-item" data-value="Major">Major</div>
+                        <div class="dropdown-item" data-value="Col">Col</div>
+                        <div class="dropdown-item" data-value="Not specified">Not specified</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <input type="text" class="form-control" id="editFirstName" placeholder="First Name" value="{% if payment_info %}{{ payment_info.firstName }}{% endif %}">
+                    <div class="error-message" id="firstNameError">Please enter your first name.</div>
+                </div>
+                
+                <div class="form-group">
+                    <input type="text" class="form-control" id="editSurname" placeholder="Surname" value="{% if payment_info %}{{ payment_info.surname }}{% endif %}">
+                    <div class="error-message" id="surnameError">Please enter your last name.</div>
+                </div>
+                
+                <div class="form-group">
+                    <input type="text" class="form-control" id="editAddressLine1" placeholder="Address Line 1" maxlength="35" value="{% if payment_info %}{{ payment_info.addressLine1 }}{% endif %}">
+                    <div class="error-message" id="addressLine1Error">Please enter a maximum of 35 characters.</div>
+                </div>
+                
+                <div class="form-group">
+                    <input type="text" class="form-control" id="editAddressLine2" placeholder="Apartment, Suite, Building Access Code (Optional)" value="{% if payment_info %}{{ payment_info.addressLine2 }}{% endif %}">
+                    <span class="optional-text">Optional</span>
+                </div>
+                
+                <div class="form-group">
+                    <input type="text" class="form-control" id="editTownCity" placeholder="Town/City" value="{% if payment_info %}{{ payment_info.townCity }}{% endif %}">
+                    <div class="error-message" id="townCityError">Please enter your town/city.</div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group" style="flex: 1;">
+                        <input type="text" class="form-control" id="editCounty" placeholder="County (opt.)" value="{% if payment_info %}{{ payment_info.county }}{% endif %}">
+                        <span class="optional-text">Optional</span>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <input type="text" class="form-control" id="editPostcode" placeholder="Postcode" value="{% if payment_info %}{{ payment_info.postcode }}{% endif %}">
+                        <div class="error-message" id="postcodeError">Please enter a valid postcode.</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <input type="text" class="form-control" id="editCountry" value="United Kingdom" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="isBusinessAddress">
+                        This is a business address
+                        <i class="fas fa-question-circle" title="Select this if this address is for a business"></i>
+                    </label>
+                </div>
+                
+                <div class="edit-form-buttons">
+                    <button class="btn-cancel" id="cancelEditBtn">Cancel</button>
+                    <button class="btn-save" id="saveEditBtn">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <!-- Contact Information -->
+            <div class="form-section">
+                <h2>What's your contact information?</h2>
+                <input type="email" class="form-control" id="email" placeholder="Email" value="{% if payment_info %}{{ payment_info.email }}{% endif %}">
+                <div class="form-row">
+                    <input type="text" class="form-control area-code" placeholder="Area code">
+                    <input type="text" class="form-control phone-number" id="phone" placeholder="Phone number" value="{% if payment_info %}{{ payment_info.phone }}{% endif %}">
+                </div>
+            </div>
+
+            <!-- Billing Address -->
+            <div class="form-section">
+                <h2>Billing Address</h2>
+                <input type="text" class="form-control" placeholder="First Name" value="{% if payment_info %}{{ payment_info.firstName }}{% endif %}">
+                <input type="text" class="form-control" placeholder="Surname" value="{% if payment_info %}{{ payment_info.surname }}{% endif %}">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="useShippingAddress" checked>
+                    I want to use my shipping address
+                </label>
+                <div id="billingAddressFields" style="display: none;">
+                    <input type="text" class="form-control" placeholder="Address">
+                    <div class="form-row">
+                        <input type="text" class="form-control" placeholder="City/Country">
+                        <input type="text" class="form-control" placeholder="Postcode">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Method -->
+            <div class="form-section">
+                <h2>How do you want to pay?</h2>
+                <div class="payment-option">
+                    <label>
+                        <input type="radio" name="paymentMethod" value="paypal">
+                        Paypal
+                    </label>
+                </div>
+                <div class="payment-option">
+                    <label>
+                        <input type="radio" name="paymentMethod" value="card" checked>
+                        Debit/Credit card
+                    </label>
+                </div>
+
+                <div id="cardDetails">
+                    <div class="card-input-group">
+                        <input type="text" class="form-control" id="cardNumber" placeholder="Card number (e.g. 4123 4567 8901 2345)" maxlength="19">
+                        <span id="cardTypeText"></span>
+                    </div>
+                    <div class="form-row">
+                        <input type="text" class="form-control" id="expirationDate" placeholder="Expiration date: MM/YY" value="{% if payment_info %}{{ payment_info.expiryDate }}{% endif %}">
+                        <input type="text" class="form-control" placeholder="CVV" maxlength="4">
+                    </div>
+                    <div class="card-info">
+                        <span id="cardDisplay">
+                            {% if payment_info and payment_info.cardNumberLast4 %}
+                                {{ payment_info.cardNumberLast4 }} ({{ payment_info.expiryDate }})
+                            {% else %}
+                                Enter your card details
+                            {% endif %}
+                        </span>
+                        <span class="saved-card">Saved Card</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="review-button" id="reviewOrderBtn">Review your order</button>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 获取编辑相关的元素
+    const editAddressBtn = document.getElementById('editAddressBtn');
+    const editAddressForm = document.getElementById('editAddressForm');
+    const cancelEditBtn = document.getElementById('cancelEditBtn');
+    const saveEditBtn = document.getElementById('saveEditBtn');
+    const nameDisplay = document.getElementById('nameDisplay');
+    const addressDisplay = document.getElementById('addressDisplay');
+    const reviewOrderBtn = document.getElementById('reviewOrderBtn');
+    
+    // 编辑表单的输入字段
+    const editTitle = document.getElementById('editTitle');
+    const editFirstName = document.getElementById('editFirstName');
+    const editSurname = document.getElementById('editSurname');
+    const editAddressLine1 = document.getElementById('editAddressLine1');
+    const editAddressLine2 = document.getElementById('editAddressLine2');
+    const editTownCity = document.getElementById('editTownCity');
+    const editCounty = document.getElementById('editCounty');
+    const editPostcode = document.getElementById('editPostcode');
+    const email = document.getElementById('email');
+    const phone = document.getElementById('phone');
+    const cardNumber = document.getElementById('cardNumber');
+    const expirationDate = document.getElementById('expirationDate');
+    const cardDisplay = document.getElementById('cardDisplay');
+    
+    // 初始化卡片类型文本（如果有已保存的卡片信息）
+    const cardText = cardDisplay.textContent.trim();
+    if (cardText.includes('****')) {
+        // 根据显示的文本推断卡片类型
+        if (cardText.toLowerCase().includes('visa')) {
+            updateCardTypeText('Visa');
+        } else if (cardText.toLowerCase().includes('mastercard')) {
+            updateCardTypeText('Mastercard');
+        } else if (cardText.toLowerCase().includes('amex') || cardText.toLowerCase().includes('american express')) {
+            updateCardTypeText('Amex');
+        } else if (cardText.toLowerCase().includes('discover')) {
+            updateCardTypeText('Discover');
+        } else if (cardText.toLowerCase().includes('jcb')) {
+            updateCardTypeText('JCB');
+        } else if (cardText.toLowerCase().includes('diners')) {
+            updateCardTypeText('Diners');
+        }
+    }
+    
+    // 保存按钮的点击事件
+    saveEditBtn.addEventListener('click', function() {
+        if (!validateForm()) {
+            return;
+        }
+        
+        // 更新显示的名称和地址
+        const fullName = [editTitle.value, editFirstName.value, editSurname.value].filter(Boolean).join(' ');
+        nameDisplay.textContent = fullName || 'Title';
+        
+        const fullAddress = [
+            editAddressLine1.value,
+            editAddressLine2.value,
+            editTownCity.value,
+            editCounty.value,
+            editPostcode.value
+        ].filter(Boolean).join(', ');
+        
+        addressDisplay.textContent = fullAddress || 'Address';
+        editAddressForm.style.display = 'none';
+    });
+    
+    // 点击Edit按钮显示编辑表单
+    editAddressBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        editAddressForm.style.display = 'block';
+    });
+    
+    // 点击Cancel按钮隐藏编辑表单
+    cancelEditBtn.addEventListener('click', function() {
+        editAddressForm.style.display = 'none';
+    });
+    
+    // 表单验证函数
+    function validateForm() {
+        let isValid = true;
+        const fields = [
+            { input: editFirstName, error: document.getElementById('firstNameError') },
+            { input: editSurname, error: document.getElementById('surnameError') },
+            { input: editAddressLine1, error: document.getElementById('addressLine1Error') },
+            { input: editTownCity, error: document.getElementById('townCityError') },
+            { input: editPostcode, error: document.getElementById('postcodeError') }
+        ];
+        
+        fields.forEach(field => {
+            if (!field.input.value.trim()) {
+                field.input.classList.add('error');
+                field.error.style.display = 'block';
+                isValid = false;
+            } else {
+                field.input.classList.remove('error');
+                field.error.style.display = 'none';
+            }
+        });
+        
+        // 特殊验证：地址行1最大长度
+        if (editAddressLine1.value.length > 35) {
+            editAddressLine1.classList.add('error');
+            document.getElementById('addressLine1Error').style.display = 'block';
+            isValid = false;
+        }
+        
+        return isValid;
+    }
+    
+    // Title dropdown functionality
+    const titleDropdown = document.getElementById('titleDropdown');
+    const dropdownItems = document.querySelectorAll('.dropdown-item');
+    
+    editTitle.addEventListener('click', function() {
+        titleDropdown.style.display = titleDropdown.style.display === 'none' ? 'block' : 'none';
+    });
+    
+    dropdownItems.forEach(item => {
+        item.addEventListener('click', function() {
+            editTitle.value = this.dataset.value;
+            titleDropdown.style.display = 'none';
+        });
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!editTitle.contains(e.target) && !titleDropdown.contains(e.target)) {
+            titleDropdown.style.display = 'none';
+        }
+    });
+    
+    // Review Order按钮点击事件
+    reviewOrderBtn.addEventListener('click', function() {
+        // 验证必填字段
+        const requiredFields = [
+            { field: cardNumber, name: "Card number" },
+            { field: expirationDate, name: "Expiration date" },
+            { field: email, name: "Email" },
+            { field: phone, name: "Phone number" }
+        ];
+        
+        let missingFields = [];
+        requiredFields.forEach(item => {
+            if (!item.field.value.trim()) {
+                missingFields.push(item.name);
+                item.field.classList.add('error');
+            } else {
+                item.field.classList.remove('error');
+            }
+        });
+        
+        // 检查地址是否已填写
+        if (nameDisplay.textContent === 'Title' || addressDisplay.textContent === 'Address') {
+            if (!editFirstName.value || !editSurname.value || !editAddressLine1.value || !editTownCity.value || !editPostcode.value) {
+                alert('Please fill in your shipping address information.');
+                // 打开地址编辑表单
+                editAddressForm.style.display = 'block';
+                return;
+            }
+        }
+        
+        if (missingFields.length > 0) {
+            alert('Please fill in the following required fields: ' + missingFields.join(', '));
+            return;
+        }
+        
+        // 收集表单数据
+        const formData = {
+            title: editTitle.value || (nameDisplay.textContent !== 'Title' ? nameDisplay.textContent.split(' ')[0] : ''),
+            firstName: editFirstName.value || (nameDisplay.textContent !== 'Title' ? nameDisplay.textContent.split(' ')[1] : ''),
+            surname: editSurname.value || (nameDisplay.textContent !== 'Title' ? nameDisplay.textContent.split(' ')[2] : ''),
+            addressLine1: editAddressLine1.value || (addressDisplay.textContent !== 'Address' ? addressDisplay.textContent.split(', ')[0] : ''),
+            addressLine2: editAddressLine2.value || (addressDisplay.textContent !== 'Address' ? addressDisplay.textContent.split(', ')[1] : ''),
+            townCity: editTownCity.value || (addressDisplay.textContent !== 'Address' ? addressDisplay.textContent.split(', ')[2] : ''),
+            county: editCounty.value || (addressDisplay.textContent !== 'Address' ? addressDisplay.textContent.split(', ')[3] : ''),
+            postcode: editPostcode.value || (addressDisplay.textContent !== 'Address' ? addressDisplay.textContent.split(', ')[4] : ''),
+            email: email.value,
+            phone: phone.value,
+            cardNumber: cardNumber.value,
+            expiryDate: expirationDate.value
+        };
+
+        // 发送数据到后端
+        fetch('{% url "payment_check" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // 跳转到checkout页面
+                window.location.href = '{% url "checkout" %}';
+            } else {
+                alert('An error occurred: ' + (data.message || 'Please check your information and try again.'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while processing your information. Please try again.');
+        });
+    });
+    
+    // 保留现有的其他JavaScript代码
+    const newAddressBtn = document.getElementById('newAddressBtn');
+    const newAddressForm = document.getElementById('newAddressForm');
+    
+    newAddressBtn.addEventListener('click', function() {
+        newAddressForm.style.display = newAddressForm.style.display === 'none' ? 'block' : 'none';
+    });
+
+    const useShippingAddressCheckbox = document.getElementById('useShippingAddress');
+    const billingAddressFields = document.getElementById('billingAddressFields');
+    
+    useShippingAddressCheckbox.addEventListener('change', function() {
+        billingAddressFields.style.display = this.checked ? 'none' : 'block';
+    });
+
+    const paymentMethodRadios = document.getElementsByName('paymentMethod');
+    const cardDetails = document.getElementById('cardDetails');
+    
+    Array.from(paymentMethodRadios).forEach(radio => {
+        radio.addEventListener('change', function() {
+            cardDetails.style.display = this.value === 'card' ? 'block' : 'none';
+        });
+    });
+
+    // 监听卡号输入
+    cardNumber.addEventListener('input', function(e) {
+        // 移除所有非数字字符，但保留空格
+        let value = this.value.replace(/[^\d\s]/g, '');
+        // 移除所有空格，然后重新格式化
+        value = value.replace(/\s/g, '');
+        
+        // 格式化为每4个数字一组，中间加空格
+        let formattedValue = '';
+        for (let i = 0; i < value.length; i++) {
+            if (i > 0 && i % 4 === 0) {
+                formattedValue += ' ';
+            }
+            formattedValue += value[i];
+        }
+        
+        // 设置格式化后的值
+        this.value = formattedValue;
+        
+        // 限制长度为19位（16位数字 + 3个空格）
+        if (value.length > 16) {
+            this.value = formattedValue.slice(0, 19);
+        }
+        
+        // 检测卡片类型
+        detectCardType(value);
+        
+        updateCardDisplay();
+    });
+
+    // 信用卡类型检测函数
+    function detectCardType(cardNumber) {
+        // 移除所有空格
+        const cleanNumber = cardNumber.replace(/\s+/g, '');
+        let cardType = '';
+        
+        // 信用卡类型检测规则
+        if (cleanNumber.startsWith('4')) {
+            cardType = 'Visa';
+        } else if (/^5[1-5]/.test(cleanNumber)) {
+            cardType = 'Mastercard';
+        } else if (/^3[47]/.test(cleanNumber)) {
+            cardType = 'Amex';
+        } else if (/^6(?:011|5)/.test(cleanNumber)) {
+            cardType = 'Discover';
+        } else if (/^(?:2131|1800|35\d{3})/.test(cleanNumber)) {
+            cardType = 'JCB';
+        } else if (/^3(?:0[0-5]|[68])/.test(cleanNumber)) {
+            cardType = 'Diners';
+        }
+        
+        // 保存卡片类型，以便在updateCardDisplay中使用
+        window.detectedCardType = cardType;
+        
+        // 更新卡片类型文本
+        updateCardTypeText(cardType);
+    }
+    
+    // 更新卡片类型文本
+    function updateCardTypeText(cardType) {
+        const cardTypeText = document.getElementById('cardTypeText');
+        
+        if (cardType) {
+            cardTypeText.textContent = cardType;
+            cardTypeText.style.display = 'inline-block';
+        } else {
+            cardTypeText.textContent = '';
+            cardTypeText.style.display = 'none';
+        }
+    }
+
+    // 修改卡片信息显示逻辑
+    function updateCardDisplay() {
+        if (cardNumber.value) {
+            // 获取没有空格的纯数字
+            const cardValue = cardNumber.value.replace(/\s/g, '');
+            if (cardValue.length > 0 && expirationDate.value) {
+                const lastFourDigits = cardValue.slice(-4);
+                const cardType = window.detectedCardType || '';
+                let displayText = `**** **** **** ${lastFourDigits} (${expirationDate.value})`;
+                cardDisplay.textContent = displayText;
+            }
+        } else if (!cardNumber.value && cardDisplay.textContent.includes('****')) {
+            // 保留现有的卡片显示
+        } else {
+            cardDisplay.textContent = 'Enter your card details';
+        }
+    }
+
+    // 监听过期时间输入
+    expirationDate.addEventListener('input', function(e) {
+        // 格式化MM/YY
+        let value = this.value.replace(/\D/g, '');
+        if (value.length > 2) {
+            value = value.slice(0, 2) + '/' + value.slice(2, 4);
+        }
+        this.value = value;
+        
+        // 验证月份
+        if (value.length >= 2) {
+            const month = parseInt(value.slice(0, 2));
+            if (month > 12) {
+                this.value = '12' + (value.length > 2 ? '/' + value.slice(2) : '');
+            }
+        }
+        
+        if (this.value.length > 5) {
+            this.value = this.value.slice(0, 5);
+        }
+        updateCardDisplay();
+    });
+});
+</script>
+{% endblock %} 

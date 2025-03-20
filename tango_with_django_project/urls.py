@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 
 from app01 import views
 
@@ -25,6 +25,14 @@ urlpatterns = [
     path('signin/', views.signin, name='signin'),
     path('signup/', views.signup, name='signup'),
     path('signout/', views.signout, name='signout'),
+    path('admin-feedback-list/', views.admin_feedback_list, name='admin_feedback_list'),
+    path('admin-feedback-response/', views.admin_feedback_response, name='admin_feedback_response'),
+    path('admin-feedback-resolve/', views.admin_feedback_resolve, name='admin_feedback_resolve'),
+    path('admin-login/', views.admin_login, name='admin_login'),
+    path('admin-logout/', views.admin_logout, name='admin_logout'),
+    path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('admin-order/<int:order_id>/', views.admin_order_detail, name='admin_order_detail'),
+    path('admin-update-order/<int:order_id>/', views.admin_update_order_status, name='admin_update_order_status'),
     path('ipad/', views.ipad, name='ipad'),
     path('ipadmini/', views.ipadmini, name='ipadmini'),
     path('ipadpro/', views.ipadpro, name='ipadpro'),
@@ -39,6 +47,8 @@ urlpatterns = [
     path('iphone16/', views.iphone16, name='iphone16'),
     path('personal-info/', views.personal_info, name='personal_info'),
     path('my-orders/', views.my_orders, name='my_orders'),
+    path('order-feedback/', views.order_feedback, name='order_feedback'),
+    path('order-feedback-history/<int:order_id>/', views.order_feedback_history, name='order_feedback_history'),
     path('bag/', views.bag, name='bag'),
     path('add-to-bag/', views.add_to_bag, name='add_to_bag'),
     path('remove-from-bag/', views.remove_from_bag, name='remove_from_bag'),
@@ -57,4 +67,8 @@ urlpatterns = [
     path('magic-keyboard/', views.magic_keyboard, name='magic_keyboard'),
     path('homepod-mini/', views.homepod_mini, name='homepod_mini'),
     path('airpods-pro/', views.airpods_pro, name='airpods_pro'),
+    path('payment-check/', views.payment_check, name='payment_check'),
+    path('checkout/', views.checkout, name='checkout'),
+    path('change-info/', views.change_info, name='change_info'),
+    path('success/', views.success, name='success'),
 ]

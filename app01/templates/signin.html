@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -100,7 +100,7 @@
     </style>
 </head>
 <body>
-    <!-- 顶部导航 -->
+    <!-- Top Navigation -->
     <header class="header">
         <div class="container header-container">
             <a href="{% url 'homepage' %}" class="brand">E-Trade Account</a>
@@ -114,13 +114,13 @@
     <div class="container">
         <div class="login-container">
             <h1 class="login-title">E-Trade Account</h1>
-            <p class="login-subtitle">manage your E-Trade account</p>
+            <p class="login-subtitle">Manage your E-Trade account</p>
             
             <div class="login-form">
                 <form method="post" action="{% url 'signin' %}">
                     {% csrf_token %}
                     <div class="mb-3">
-                        <input type="text" class="form-control" id="username" name="username" placeholder="E-mail or Phone Number" required>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
                     </div>
                     
                     <div class="btn-container">

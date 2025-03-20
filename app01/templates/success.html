@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Order Successful - Apple Store{% endblock %}
+
+{% block extra_css %}
+<style>
+    .success-container {
+        max-width: 800px;
+        margin: 50px auto;
+        text-align: center;
+        padding: 40px 20px;
+    }
+    
+    .success-icon {
+        font-size: 80px;
+        color: #4CD964;
+        margin-bottom: 20px;
+    }
+    
+    .success-title {
+        font-size: 32px;
+        font-weight: 500;
+        margin-bottom: 20px;
+        color: #333;
+    }
+    
+    .success-message {
+        font-size: 18px;
+        color: #666;
+        margin-bottom: 40px;
+        line-height: 1.5;
+    }
+    
+    .btn-continue {
+        background-color: #0071e3;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 16px;
+        margin-top: 20px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: background-color 0.3s;
+    }
+    
+    .btn-continue:hover {
+        background-color: #0062c4;
+    }
+    
+    .order-details {
+        margin-top: 40px;
+        background-color: #f5f5f7;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: left;
+    }
+    
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+    
+    .detail-label {
+        font-weight: 500;
+        color: #666;
+    }
+    
+    .order-id {
+        font-family: monospace;
+        background-color: #e9e9eb;
+        padding: 2px 5px;
+        border-radius: 4px;
+    }
+    
+    .view-orders-link {
+        color: #0071e3;
+        text-decoration: none;
+        margin-top: 15px;
+        display: inline-block;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="success-container">
+    <div class="success-icon">
+        <i class="fas fa-check-circle"></i>
+    </div>
+    
+    <h1 class="success-title">Order Successful!</h1>
+    
+    <p class="success-message">
+        Thank you for your purchase. Your order has been received and is being processed.<br>
+        A confirmation email has been sent to your email address.
+    </p>
+    
+    {% if order_id %}
+    <div class="order-details">
+        <div class="detail-row">
+            <span class="detail-label">Order Number:</span>
+            <span class="order-id">{% if order_number %}{{ order_number }}{% else %}{{ order_id }}{% endif %}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Order Date:</span>
+            <span>{{ order_date }}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Total Amount:</span>
+            <span>£{{ total_amount }}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Items:</span>
+            <span>{% if order_items %}{{ order_items }}{% else %}Multiple{% endif %} items</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Shipping Method:</span>
+            <span>Standard Delivery</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Estimated Delivery:</span>
+            <span>3-5 business days</span>
+        </div>
+    </div>
+    {% endif %}
+    
+    <a href="{% url 'my_orders' %}" class="view-orders-link">View Your Orders</a>
+    
+    <a href="{% url 'index' %}" class="btn-continue">Continue Shopping</a>
+</div>
+{% endblock %} 
