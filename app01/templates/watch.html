@@ -498,7 +498,7 @@
 
             <p class="hero-price">From £399</p>
 
-            <button class="btn btn-buy">Buy Now</button>
+            <a href="{% url 'watch_series_10' %}" class="btn btn-buy">Buy Now</a>
 
         </div>
 
@@ -510,7 +510,7 @@
 
     <div class="video-container">
 
-        <video id="watchVideo" autoplay muted loop playsinline poster="{% static 'images/watch_poster.jpg' %}">
+        <video id="watchVideo" autoplay muted loop playsinline width="3200" height="1800">
 
             <source src="{% static 'videos/watch_promo.mp4' %}" type="video/mp4">
 
