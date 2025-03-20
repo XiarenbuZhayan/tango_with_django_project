@@ -431,7 +431,7 @@ def iphone16pro(request):
                     'storage_options': [
                         {'size': 256, 'price': 1099},
                         {'size': 512, 'price': 1299},
-                        {'size': '1T', 'price': 1499}
+                        {'size': '1TB', 'price': 1499}
                     ]
                 },
                 {
@@ -441,7 +441,7 @@ def iphone16pro(request):
                     'storage_options': [
                         {'size': 256, 'price': 1199},
                         {'size': 512, 'price': 1399},
-                        {'size': '1T', 'price': 1599}
+                        {'size': '1TB', 'price': 1599}
                     ]
                 }
             ],
@@ -454,7 +454,7 @@ def iphone16pro(request):
             'storage_options': [
                 {'size': 256, 'price': 1099},
                 {'size': 512, 'price': 1299},
-                {'size': '1T', 'price': 1499}
+                {'size': '1TB', 'price': 1499}
             ],
             'price': 1099,
             'monthly_price': 45.79,

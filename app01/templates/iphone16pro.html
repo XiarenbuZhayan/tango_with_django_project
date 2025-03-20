@@ -217,6 +217,57 @@
     background: #999;
     cursor: not-allowed;
 }
+
+.toast-container {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.custom-toast {
+    background-color: #fff;
+    color: #333;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.toast-success {
+    border-left: 4px solid #4CAF50;
+}
+
+.toast-error {
+    border-left: 4px solid #F44336;
+}
+
+.toast-icon {
+    margin-right: 10px;
+    font-size: 20px;
+}
+
+.toast-success .toast-icon {
+    color: #4CAF50;
+}
+
+.toast-error .toast-icon {
+    color: #F44336;
+}
+
+.toast-message {
+    flex-grow: 1;
+}
+
+.toast-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
 </style>
 {% endblock %}
 
@@ -262,7 +313,7 @@
             <div class="storage-options">
                 {% for storage in phone.storage_options %}
                 <div class="storage-option" data-storage="{{ storage.size }}" data-price="{{ storage.price }}" onclick="selectStorage(this)">
-                    <div class="storage-size">{{ storage.size }}{% if storage.size != '1T' %}GB{% endif %}</div>
+                    <div class="storage-size">{{ storage.size }}{% if storage.size != '1TB' %}GB{% endif %}</div>
                     <div class="storage-price">£{{ storage.price }}</div>
                 </div>
                 {% endfor %}
@@ -281,6 +332,9 @@
         </div>
     </div>
 </div>
+
+<!-- Toast 通知容器 -->
+<div class="toast-container" id="toast-container"></div>
 
 <script>
 function selectModel(element) {
@@ -396,9 +450,10 @@ function updateSummary() {
     let storageText = 'Select storage';
     if (selectedStorage) {
         const storageSize = selectedStorage.getAttribute('data-storage');
-        storageText = `Storage: ${storageSize}`;
-        if (storageSize !== '1T') {
-            storageText += 'GB';
+        if (storageSize === '1TB') {
+            storageText = `Storage: 1TB`;
+        } else {
+            storageText = `Storage: ${storageSize}GB`;
         }
     }
     document.getElementById('storage-summary').textContent = storageText;
@@ -431,8 +486,135 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    // 为添加到购物车按钮添加点击事件
+    document.getElementById('add-to-cart').addEventListener('click', addToCart);
+    
     // 初始化摘要
     updateSummary();
 });
+
+// 添加到购物车
+function addToCart() {
+    // 获取选中的型号、颜色和存储
+    const selectedModel = document.querySelector('.option.selected');
+    const selectedColor = document.querySelector('.color-btn.selected');
+    const selectedStorage = document.querySelector('.storage-option.selected');
+    
+    // 如果任何一项未选择，则不执行添加操作
+    if (!selectedModel || !selectedColor || !selectedStorage) return;
+    
+    // 获取选中项的详细信息
+    const modelName = selectedModel.getAttribute('data-model');
+    const colorName = selectedColor.getAttribute('data-color');
+    const storageSize = selectedStorage.getAttribute('data-storage');
+    const price = parseFloat(selectedStorage.getAttribute('data-price'));
+    
+    // 格式化存储显示
+    const formattedStorage = storageSize === '1TB' ? '1TB' : `${storageSize}GB`;
+    
+    // 构建产品名称
+    const productName = `${modelName} ${formattedStorage} ${colorName}`;
+    
+    // 获取当前选中的图片URL
+    const productImage = document.getElementById('phone-image').src;
+    
+    // 构建产品ID（用于购物车中的标识）
+    const productId = `iphone-${modelName.toLowerCase().replace(/\s+/g, '-')}-${storageSize.toLowerCase()}-${colorName.toLowerCase().replace(/\s+/g, '-')}`;
+    
+    // 构建产品数据
+    const productData = {
+        product_id: productId,
+        product_name: productName,
+        product_price: price,
+        product_image: productImage,
+        quantity: 1
+    };
+    
+    // 发送添加到购物车请求
+    fetch('{% url "add_to_bag" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify(productData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast('success', 'Added to bag successfully!');
+            // 更新导航栏购物车图标的数量
+            updateCartCount(data.items_count);
+        } else {
+            showToast('error', 'Failed to add to bag: ' + data.message);
+        }
+    })
+    .catch(error => {
+        showToast('error', 'An error occurred: ' + error);
+        console.error('Error:', error);
+    });
+}
+
+// 获取CSRF令牌的函数
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// 显示通知的函数
+function showToast(type, message) {
+    const toastContainer = document.getElementById('toast-container');
+    
+    // 创建通知元素
+    const toast = document.createElement('div');
+    toast.className = `custom-toast toast-${type}`;
+    
+    // 通知内容
+    toast.innerHTML = `
+        <div class="toast-icon">
+            ${type === 'success' ? '✓' : '✗'}
+        </div>
+        <div class="toast-message">${message}</div>
+    `;
+    
+    // 添加到容器
+    toastContainer.appendChild(toast);
+    
+    // 显示通知
+    setTimeout(() => {
+        toast.classList.add('toast-visible');
+    }, 10);
+    
+    // 3秒后自动移除
+    setTimeout(() => {
+        toast.classList.remove('toast-visible');
+        setTimeout(() => {
+            toastContainer.removeChild(toast);
+        }, 300);
+    }, 3000);
+}
+
+// 更新购物车数量的函数
+function updateCartCount(count) {
+    const cartCountElement = document.querySelector('.cart-count');
+    if (cartCountElement) {
+        cartCountElement.textContent = count;
+        
+        // 如果之前没有商品，显示购物车计数
+        if (count > 0 && cartCountElement.classList.contains('d-none')) {
+            cartCountElement.classList.remove('d-none');
+        }
+    }
+}
 </script>
 {% endblock %} 
